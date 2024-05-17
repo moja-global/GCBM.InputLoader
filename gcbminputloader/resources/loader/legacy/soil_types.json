@@ -1,0 +1,11 @@
+﻿{
+    "SQLLoaderMapping": {
+        "name": "Soil types",
+        "fetch_sql": "
+            SELECT DISTINCT name AS SoilType
+            FROM tblafforestationpretypedefault",
+        "load_sql": "
+            INSERT INTO soil_type (name)
+            VALUES (@SoilType)"
+    }
+}

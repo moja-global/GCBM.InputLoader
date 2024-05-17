@@ -1,0 +1,62 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ReoGrid="clr-namespace:unvell.ReoGrid;assembly=unvell.ReoGrid" x:Class="Recliner2GCBM.View.GrowthCurveTab" 
+             mc:Ignorable="d" 
+             Height="350" Width="650"
+             DataContext="{Binding Source={StaticResource GrowthCurveTabViewModel}}">
+    <Grid>
+        <StatusBar Height="50" VerticalAlignment="Top">
+            <Grid Width="650" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Label HorizontalAlignment="Left" Content="Configure Growth Curves" VerticalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+                <Image HorizontalAlignment="Right" Height="44" VerticalAlignment="Top" Width="50" Source="/Resources/1461025236_sofa.ico" Margin="0,0,10,0"/>
+            </Grid>
+        </StatusBar>
+        <Label Content="File" HorizontalAlignment="Left" Margin="7,60,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="35,62,0,0" TextWrapping="NoWrap"
+                 Text="{Binding AppContext.ProjectConfiguration.GrowthCurves.Path}" VerticalAlignment="Top" Width="425" IsEnabled="{Binding Ready}"/>
+        <Button Content="Browse..." HorizontalAlignment="Left" Margin="465,62,0,0" VerticalAlignment="Top" Width="75"
+                Command="{Binding BrowseForGrowthCurveFileCommand}" IsEnabled="{Binding Ready}"/>
+
+        <ReoGrid:ReoGridControl Name="grid" HorizontalAlignment="Left" Height="211" Margin="221,91,0,0" VerticalAlignment="Top" Width="419" ScrollViewer.HorizontalScrollBarVisibility="Visible" Readonly="True" SheetTabNewButtonVisible="False" SheetTabWidth="225" ShowScrollEndSpacing="True"/>
+        <ListView HorizontalAlignment="Left" Height="183" Margin="7,91,0,0" VerticalAlignment="Top" Width="206"
+                  ItemsSource="{Binding AppContext.ProjectConfiguration.GrowthCurves.Classifiers}" IsEnabled="{Binding Ready}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Classifier" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Column" DisplayMemberBinding="{Binding Column}"/>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Select..." Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.SelectClassifierColumnCommand}" CommandParameter="{Binding Name}" IsEnabled="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.Ready}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Content="Next" HorizontalAlignment="Left" Margin="565,318,0,0" VerticalAlignment="Top" Width="75"
+                Command="{Binding NextCommand}" IsEnabled="{Binding Ready}"/>
+        <Button Content="Back" HorizontalAlignment="Left" Margin="485,318,0,0" VerticalAlignment="Top" Width="75"
+                Command="{Binding BackCommand}" IsEnabled="{Binding Ready}"/>
+        <CheckBox Content="Header row" HorizontalAlignment="Left" Margin="561,65,0,0" VerticalAlignment="Top"
+                  IsChecked="{Binding AppContext.ProjectConfiguration.GrowthCurves.Header}" IsEnabled="{Binding Ready}"/>
+        <Label Content="Increments" HorizontalAlignment="Left" Margin="7,316,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="79,318,0,0" TextWrapping="Wrap"
+                 Text="{Binding AppContext.ProjectConfiguration.GrowthCurves.IncrementStartCol}" VerticalAlignment="Top" Width="30" IsEnabled="{Binding Ready}"/>
+        <Button Content="..." HorizontalAlignment="Left" Margin="114,318,0,0" VerticalAlignment="Top" Width="20"
+            Command="{Binding SelectIncrementColumnStartCommand}" IsEnabled="{Binding Ready}"/>
+        <Label Content="to" HorizontalAlignment="Left" Margin="135,316,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="156,318,0,0" TextWrapping="Wrap"
+        	Text="{Binding AppContext.ProjectConfiguration.GrowthCurves.IncrementEndCol}" VerticalAlignment="Top" Width="30" IsEnabled="{Binding Ready}"/>
+        <Button Content="..." HorizontalAlignment="Left" Margin="191,318,0,0" VerticalAlignment="Top" Width="20"
+                Command="{Binding SelectIncrementColumnEndCommand}" IsEnabled="{Binding Ready}"/>
+        <Label Content="Species" HorizontalAlignment="Left" Margin="284,316,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="334,318,0,0" TextWrapping="Wrap" Text="{Binding AppContext.ProjectConfiguration.GrowthCurves.SpeciesCol}" VerticalAlignment="Top" Width="30" IsEnabled="{Binding Ready}" IsReadOnly="True"/>
+        <Button Content="Select..." HorizontalAlignment="Left" Margin="369,318,0,0" VerticalAlignment="Top" Width="75" Command="{Binding SelectSpeciesColumnCommand}" IsEnabled="{Binding Ready}"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="138,279,0,0" TextWrapping="Wrap" Text="{Binding AppContext.ProjectConfiguration.GrowthCurves.Interval, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="30"/>
+        <Label Content="Growth curve interval" HorizontalAlignment="Left" Margin="7,279,0,0" VerticalAlignment="Top"/>
+    </Grid>
+</UserControl>

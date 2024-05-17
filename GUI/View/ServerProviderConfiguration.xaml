@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Recliner2GCBM.View.ServerProviderConfiguration"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Width="539" Height="96.52">
+    <UserControl.DataContext>
+        <Binding Source="{StaticResource ServerProviderConfigurationViewModel}"/>
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="109*"/>
+            <RowDefinition Height="6*"/>
+        </Grid.RowDefinitions>
+        <Label Content="Host" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.008,0.575" Width="71" HorizontalContentAlignment="Right"/>
+        <TextBox x:Name="hostText" HorizontalAlignment="Left" Height="23" Margin="71,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="376" Text="{Binding Host}"/>
+        <Label Content="Username" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.008,0.575" Width="71" HorizontalContentAlignment="Right" Margin="0,23,0,0"/>
+        <TextBox x:Name="usernameText" HorizontalAlignment="Left" Height="23" Margin="71,23,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="145" Text="{Binding UserName}"/>
+        <Label Content="Password" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.008,0.575" Width="62" HorizontalContentAlignment="Right" Margin="216,23,0,0"/>
+        <TextBox x:Name="passwordText" HorizontalAlignment="Left" Height="23" Margin="278,23,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="169" Text="{Binding Password}"/>
+        <Label Content="Database" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.008,0.575" Width="71" HorizontalContentAlignment="Right" Margin="0,46,0,0"/>
+        <TextBox x:Name="databaseText" HorizontalAlignment="Left" Height="23" Margin="71,46,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="376" Text="{Binding Database}"/>
+        <Label Content="Schema" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.008,0.575" Width="71" HorizontalContentAlignment="Right" Margin="0,69,0,0"/>
+        <TextBox x:Name="schemaText" HorizontalAlignment="Left" Height="23" Margin="71,69,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="376" Text="{Binding Schema}"/>
+    </Grid>
+</UserControl>

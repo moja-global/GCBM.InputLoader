@@ -1,0 +1,17 @@
+﻿<Application x:Class="Recliner2GCBM.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="View/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <x:NullExtension x:Key="GrowthCurveTabViewModel"/>
+            <x:NullExtension x:Key="FinishTabViewModel"/>
+            <x:NullExtension x:Key="ClassifierTabViewModel"/>
+            <x:NullExtension x:Key="TransitionRuleTabViewModel"/>
+            <x:NullExtension x:Key="MainWindowViewModel"/>
+            <x:NullExtension x:Key="FileProviderConfigurationViewModel"/>
+            <x:NullExtension x:Key="ServerProviderConfigurationViewModel"/>
+            <x:NullExtension x:Key="DisturbanceCategoryTabViewModel"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

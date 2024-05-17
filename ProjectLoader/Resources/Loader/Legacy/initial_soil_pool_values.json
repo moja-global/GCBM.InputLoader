@@ -1,0 +1,36 @@
+﻿{
+    "SQLLoaderMapping": {
+        "name": "Non-forest soil pool values",
+        "fetch_sql": "
+            SELECT
+                a.adminboundaryname AS Admin,
+                e.ecoboundaryname AS Eco,
+                st.name AS SoilType,
+                s.ssoilpoolc_bg AS BGSlowC
+            FROM tblecoboundarydefault e
+            INNER JOIN (
+                tbladminboundarydefault a
+                INNER JOIN (
+                    tblafforestationpretypedefault st
+                    INNER JOIN tblsvlattributesdefaultafforestation s
+                        ON st.pretypeid = s.pretypeid
+                ) ON a.adminboundaryid = s.adminboundaryid
+            ) ON e.ecoboundaryid = s.ecoboundaryid",
+        "load_sql": "
+            INSERT INTO soil (spatial_unit_id, soil_type_id, pool_id, value)
+            SELECT
+                spu.id,
+                st.id,
+                p.id,
+                @BGSlowC AS value
+            FROM soil_type st, pool p, spatial_unit spu
+            INNER JOIN admin_boundary a
+                ON a.name = @Admin
+                AND spu.admin_boundary_id = a.id
+            INNER JOIN eco_boundary e
+                ON e.name = @Eco
+                AND spu.eco_boundary_id = e.id
+            WHERE st.name = @SoilType
+                AND p.name = 'BelowGroundSlowSoil'"
+    }
+}
