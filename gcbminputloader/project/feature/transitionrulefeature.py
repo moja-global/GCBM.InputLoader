@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from itertools import chain
 from sqlalchemy import text
@@ -23,6 +24,7 @@ class TransitionRuleFeature(Feature):
         self._match_classifier_mapping = match_classifier_mapping
 
     def create(self, output_connection_string):
+        logging.info("Loading transition rules...")
         with get_connection(output_connection_string) as output_db:
             transition_rule_data = self._load_data(
                 self._path, self._header, sheet_name=self._worksheet
@@ -45,6 +47,7 @@ class TransitionRuleFeature(Feature):
         raise NotImplementedError()
 
     def _load_classifier_values(self, conn, transition_rule_data):
+        logging.info("  classifier values")
         unique_classifier_values = {
             classifier_name: transition_rule_data[transition_rule_data.columns[classifier_col]].unique()
             for classifier_name, classifier_col in chain(
@@ -74,6 +77,7 @@ class TransitionRuleFeature(Feature):
                 for value in chain(classifier_values, ["?"])])
         
     def _load_transitions(self, conn, transition_rule_data):
+        logging.info("  base transitions")
         transition_id_lookup = {}
         transition_type_lookup = self._get_transition_type_lookup(conn)
         for _, transition_data_row in transition_rule_data.iterrows():
@@ -105,6 +109,7 @@ class TransitionRuleFeature(Feature):
     def _load_transition_classifier_values(
         self, conn, transition_id_lookup, classifier_value_lookup, transition_rule_data
     ):
+        logging.info("  transition classifier values")
         for _, transition_data_row in transition_rule_data.iterrows():
             transition_id = transition_id_lookup[transition_data_row.iloc[self._id_col]]
             conn.execute(text(
@@ -121,7 +126,9 @@ class TransitionRuleFeature(Feature):
     def _load_soft_transitions(
         self, conn, transition_id_lookup, classifier_value_lookup, transition_rule_data
     ):
+        logging.info("  soft transition rules")
         if self._disturbance_type_col is None:
+            logging.info("    not configured")
             return
         
         disturbance_type_lookup = self._get_disturbance_type_lookup(conn)

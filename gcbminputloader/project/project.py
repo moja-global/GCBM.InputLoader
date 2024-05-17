@@ -1,3 +1,4 @@
+import logging
 import gcbminputloader
 from pathlib import Path
 from enum import Enum
@@ -32,12 +33,14 @@ class Project:
         self._features = []
 
     def create(self, output_connection_string):
+        logging.debug(f"Loading {output_connection_string} using {self._aidb_path}")
         Path(output_connection_string).unlink(True)
 
         with (
             get_connection(str(self._aidb_path)) as aidb,
             get_connection(output_connection_string) as output_db
         ):
+            logging.info("Loading default parameters...")
             project_loader_config = self._read_loader_config(f"{self._project_type.value}.json")
             for loader_config_path in project_loader_config:
                 if not loader_config_path.endswith(".json"):
@@ -63,8 +66,9 @@ class Project:
 
     def _process_loader(self, loader_config_path, aidb, output_db):
         loader_type, loader_config = next(iter(self._read_loader_config(loader_config_path).items()))
+        loader_name = loader_config.get("name", Path(loader_config_path).name)
+        logging.info(f"  {loader_name}")
         if loader_type == "InternalLoaderMapping":
-            sql = loader_config.get("sql")
             queries = self._parse_sql(
                 loader_config.get("sql")
                 or open(self._get_resource_path(

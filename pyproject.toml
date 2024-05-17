@@ -15,8 +15,5 @@ dependencies = [
 [project.scripts]
 gcbminput = "gcbminputloader.scripts.inputloader:cli"
 
-[tool.hatch.build.targets.sdist]
-include = [
-    "/gcbminputloader",
-    "projectloader/resources"
-]
+[tool.hatch.build.targets.wheel.force-include]
+"projectloader/resources" = "gcbminputloader/resources"

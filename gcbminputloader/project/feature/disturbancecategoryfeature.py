@@ -1,3 +1,4 @@
+import logging
 from sqlalchemy import text
 from gcbminputloader.project.feature.feature import Feature
 from gcbminputloader.util.db import get_connection
@@ -8,6 +9,7 @@ class DisturbanceCategoryFeature(Feature):
         self._category_mappings = category_mappings
 
     def create(self, output_connection_string):
+        logging.info("Loading disturbance categories...")
         with get_connection(output_connection_string) as output_db:
             valid_disturbance_types = {
                 row.name.lower()

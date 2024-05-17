@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from gcbminputloader.util.json import InputLoaderJson
 
@@ -24,6 +25,7 @@ class Configuration(dict):
     @classmethod
     def load(cls, config_path, working_path=None):
         config_path = Path(config_path).absolute()
+        logging.debug(f"Loading configuration: {config_path}")
 
         return cls(
             InputLoaderJson(config_path).load(),

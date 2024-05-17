@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 
 class InputLoaderJson:
@@ -11,8 +12,10 @@ class InputLoaderJson:
 
     def load(self):
         try:
+            logging.debug(f"Loading JSON file: {self._path.absolute()}")
             return json.load(open(self._path))
         except:
+            logging.debug("  retrying with corrections")
             return self._load_borked()
 
     def _load_borked(self):

@@ -1,3 +1,4 @@
+import logging
 import gcbminputloader
 from gcbminputloader.util.configuration import Configuration
 from gcbminputloader.project.project import Project
@@ -18,6 +19,9 @@ class ProjectFactory:
         config = Configuration.load(config_path)
         config_type = self._get_config_type(config)
         project_type = self._get_project_type(config)
+
+        logging.debug(f"Configuration type: {config_type.name}")
+        logging.debug(f"Project type: {project_type.name}")
 
         if config_type == ConfigurationType.Recliner2Gcbm:
             return self._load_recliner2gcbm_project(project_type, config)
@@ -87,7 +91,7 @@ class ProjectFactory:
         recliner2gcbm_project_type = config.get("Project", {}).get("Configuration")
         if recliner2gcbm_project_type is not None:
             return (
-                ProjectType.LegacyGcbmClassicSpatial if recliner2gcbm_project_type == 0
+                ProjectType.LegacyGcbmClassicSpatialNoGrowthCurves if recliner2gcbm_project_type == 1
                 else ProjectType.LegacyGcbmClassicSpatial
             )
             
@@ -95,6 +99,7 @@ class ProjectFactory:
 
     def _build_feature(self, project, feature_name, feature_config):
         if feature_name == "growth_curves":
+            logging.debug("Building growth curve feature")
             classifier_mapping = project.create_classifier_mapping(feature_config["classifier_cols"])
             return GrowthCurveFeature(
                 feature_config.resolve(feature_config["path"]), feature_config["interval"],
@@ -104,6 +109,7 @@ class ProjectFactory:
             )
         
         if feature_name == "transition_rules":
+            logging.debug("Building transition rules feature")
             transition_classifier_mapping = project.create_classifier_mapping(
                 feature_config["classifier_transition_cols"])
             
@@ -121,6 +127,7 @@ class ProjectFactory:
             )
         
         if feature_name == "disturbance_type_categories":
+            logging.debug("Building disturbance type categories feature")
             return DisturbanceCategoryFeature(feature_config)
         
         raise RuntimeError(f"Unknown feature: {feature_name}")

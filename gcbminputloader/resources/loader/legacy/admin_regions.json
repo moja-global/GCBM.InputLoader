@@ -1,7 +1,0 @@
-﻿{
-    "SQLLoaderMapping": {
-        "name": "Admin regions",
-        "fetch_sql": "SELECT TRIM(a.AdminBoundaryName) AS AdminBoundaryName FROM tblAdminBoundaryDefault a",
-        "load_sql": "INSERT INTO admin_region (name) VALUES (@AdminBoundaryName)"
-    }
-}

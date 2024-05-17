@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from itertools import chain
 from sqlalchemy import text
@@ -20,6 +21,7 @@ class GrowthCurveFeature(Feature):
         self._header = header
 
     def create(self, output_connection_string):
+        logging.info("Loading growth curves...")
         with get_connection(output_connection_string) as output_db:
             gc_data = self._load_data(self._path, self._header, sheet_name=self._worksheet)
             self._load_classifier_values(output_db, gc_data)
@@ -39,6 +41,8 @@ class GrowthCurveFeature(Feature):
                 )
 
             gc_id_lookup = self._load_growth_curves(output_db, gc_data)
+
+            logging.info("  growth curve components")
             for _, gc_data_row in gc_data.iterrows():
                 gc_id = gc_id_lookup[self._get_gc_name(gc_data_row)]
                 species_id = species_id_lookup[gc_data_row.iloc[self._aidb_species_col].lower()]
@@ -48,6 +52,7 @@ class GrowthCurveFeature(Feature):
         raise NotImplementedError()
 
     def _load_classifier_values(self, conn, gc_data):
+        logging.info("  classifier values")
         unique_classifier_values = {
             classifier_name: gc_data[gc_data.columns[classifier_col]].unique()
             for classifier_name, classifier_col in self._classifier_mapping.items()
@@ -81,6 +86,7 @@ class GrowthCurveFeature(Feature):
         return ",".join((str(v) for v in classifier_values))
 
     def _load_growth_curves(self, conn, gc_data):
+        logging.info("  growth curves")
         gc_id_lookup = {}
         classifier_value_lookup = self._get_classifier_value_lookup(conn)
         for _, gc_data_row in gc_data.iterrows():
