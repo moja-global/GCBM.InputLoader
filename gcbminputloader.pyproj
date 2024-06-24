@@ -5,7 +5,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{d8ea3bc2-61a9-43c4-b2cf-e36bce05b524}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>setup.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -19,9 +20,6 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="gcbminputloader\loader\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="gcbminputloader\project\feature\disturbancecategoryfeature.py" />
     <Compile Include="gcbminputloader\project\feature\transitionrulefeature.py" />
     <Compile Include="gcbminputloader\project\feature\growthcurvefeature.py" />
@@ -45,62 +43,16 @@
     </Compile>
     <Compile Include="gcbminputloader\__init__.py" />
     <Compile Include="gcbminputloader\__main__.py" />
-    <Compile Include="setup.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="gcbminputloader" />
-    <Folder Include="gcbminputloader\loader\" />
-    <Folder Include="gcbminputloader\resources\" />
     <Folder Include="gcbminputloader\project\" />
     <Folder Include="gcbminputloader\project\feature\" />
-    <Folder Include="gcbminputloader\resources\loader\" />
-    <Folder Include="gcbminputloader\resources\loader\common\" />
-    <Folder Include="gcbminputloader\resources\loader\legacy\" />
-    <Folder Include="gcbminputloader\resources\loader\ddl\" />
     <Folder Include="gcbminputloader\scripts\" />
     <Folder Include="gcbminputloader\util\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="gcbminputloader\resources\loader\common\accounting_rule_types.json" />
-    <Content Include="gcbminputloader\resources\loader\common\cbm_classic_spatial_schema.json" />
-    <Content Include="gcbminputloader\resources\loader\common\disturbance_categories.json" />
-    <Content Include="gcbminputloader\resources\loader\common\dom_pools.json" />
-    <Content Include="gcbminputloader\resources\loader\common\land_class_data.json" />
-    <Content Include="gcbminputloader\resources\loader\common\pool_data.json" />
-    <Content Include="gcbminputloader\resources\loader\common\root_parameters.json" />
-    <Content Include="gcbminputloader\resources\loader\common\transition_types.json" />
-    <Content Include="gcbminputloader\resources\loader\ddl\cbmclassicspatial.ddl.postgresql" />
-    <Content Include="gcbminputloader\resources\loader\ddl\cbmclassicspatial.ddl.sqlite" />
-    <Content Include="gcbminputloader\resources\loader\ddl\drop_growth_curve_tables.ddl.postgresql" />
-    <Content Include="gcbminputloader\resources\loader\ddl\drop_growth_curve_tables.ddl.sqlite" />
-    <Content Include="gcbminputloader\resources\loader\legacy\admin_boundaries.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\admin_regions.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\decay_parameters.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\disturbance_matrix_associations.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\disturbance_matrix_names.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\disturbance_matrix_values.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\disturbance_types.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\eco_boundaries.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\eco_regions.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\forest_types.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\genus_types.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\growth_multiplier_associations.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\growth_multiplier_series.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\growth_multiplier_values.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\initial_soil_pool_values.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\soil_types.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\spatial_units.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\species_types.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\spinup_parameters.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\stump_parameters.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\turnover_parameters.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\turnover_parameter_associations.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\user_defined_pools.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\vol_to_bio_associations.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy\vol_to_bio_parameters.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy_cbm_classic_spatial.json" />
-    <Content Include="gcbminputloader\resources\loader\legacy_cbm_spatial_no_gc_tables.json" />
-    <Content Include="manifest.in" />
+    <Content Include="pyproject.toml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

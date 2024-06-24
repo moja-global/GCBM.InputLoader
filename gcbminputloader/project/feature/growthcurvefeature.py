@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from collections import defaultdict
 from itertools import chain
@@ -8,8 +9,9 @@ from gcbminputloader.util.db import get_connection
 class GrowthCurveFeature(Feature):
     
     def __init__(
-        self, path, interval, aidb_species_col, increment_start_col, increment_end_col,
-        classifier_mapping, worksheet=None, header=True
+        self, path: [str, Path], interval: int, aidb_species_col: int, increment_start_col: int,
+        increment_end_col: int, classifier_mapping: dict[str, int], worksheet: [int, None] = None,
+        header: bool = True
     ):
         self._path = path
         self._interval = interval
@@ -18,9 +20,9 @@ class GrowthCurveFeature(Feature):
         self._increment_end_col = increment_end_col
         self._classifier_mapping = classifier_mapping
         self._worksheet = worksheet
-        self._header = header
+        self._header = header if header is not None else True
 
-    def create(self, output_connection_string):
+    def create(self, output_connection_string: str):
         logging.info("Loading growth curves...")
         with get_connection(output_connection_string) as output_db:
             gc_data = self._load_data(self._path, self._header, sheet_name=self._worksheet)
@@ -48,10 +50,24 @@ class GrowthCurveFeature(Feature):
                 species_id = species_id_lookup[gc_data_row.iloc[self._aidb_species_col].lower()]
                 self._load_growth_curve_component(output_db, gc_id, species_id, gc_data_row)
 
-    def save(self, config_path):
-        raise NotImplementedError()
+    def save(self, config: Configuration):
+        logging.info("  growth curves")
+        config["growth_curves"] = {
+            "path": config.resolve_working_relative(self._path),
+            "interval": self._interval,
+            "aidb_species_col": self._aidb_species_col,
+            "increment_start_col": self._increment_start_col,
+            "increment_end_col": self._increment_end_col,
+            "classifier_cols": self._classifier_mapping
+        }
+        
+        if not self._header:
+            config["growth_curves"]["header"] = False
+            
+        if self._worksheet is not None:
+            config["growth_curves"]["worksheet"] = self._worksheet
 
-    def _load_classifier_values(self, conn, gc_data):
+    def _load_classifier_values(self, conn: Connection, gc_data: DataFrame):
         logging.info("  classifier values")
         unique_classifier_values = {
             classifier_name: gc_data[gc_data.columns[classifier_col]].unique()
@@ -78,14 +94,14 @@ class GrowthCurveFeature(Feature):
             ), [{"classifier_id": classifier_ids[classifier_name], "value": str(value)}
                 for value in chain(classifier_values, ["?"])])
         
-    def _get_gc_name(self, gc_data_row):
+    def _get_gc_name(self, gc_data_row: Series) -> str:
         classifier_values = [
             gc_data_row.iloc[col] for col in self._classifier_mapping.values()
         ]
         
         return ",".join((str(v) for v in classifier_values))
 
-    def _load_growth_curves(self, conn, gc_data):
+    def _load_growth_curves(self, conn: Connection, gc_data: DataFrame) -> dict[str, int]:
         logging.info("  growth curves")
         gc_id_lookup = {}
         classifier_value_lookup = self._get_classifier_value_lookup(conn)
@@ -121,7 +137,7 @@ class GrowthCurveFeature(Feature):
         
         return gc_id_lookup
 
-    def _get_classifier_value_lookup(self, conn):
+    def _get_classifier_value_lookup(self, conn: Connection) -> dict[str, dict[str, int]]:
         classifier_value_lookup = defaultdict(dict)
         for row in conn.execute(text(
             """
@@ -135,7 +151,9 @@ class GrowthCurveFeature(Feature):
 
         return classifier_value_lookup
 
-    def _load_growth_curve_component(self, conn, gc_id, species_id, gc_data_row):
+    def _load_growth_curve_component(
+        self, conn: Connection, gc_id: int, species_id: int, gc_data_row: DataFrame
+    ):
         conn.execute(text(
             """
             INSERT INTO growth_curve_component (growth_curve_id, species_id)

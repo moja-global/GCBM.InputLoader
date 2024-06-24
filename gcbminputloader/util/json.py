@@ -1,16 +1,17 @@
+from __future__ import annotations
 import json
 import logging
 from pathlib import Path
 
 class InputLoaderJson:
     
-    def __init__(self, path):
+    def __init__(self, path: [str, Path]):
         self._path = Path(path)
        
-    def resolve(self, path):
+    def resolve(self, path: [str, Path]) -> Path:
         return self._path.parent.joinpath(path).resolve()
 
-    def load(self):
+    def load(self) -> dict:
         try:
             logging.debug(f"Loading JSON file: {self._path.absolute()}")
             return json.load(open(self._path))

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gcbminputloader"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">= 3.10"
 dependencies = [
     "sqlalchemy",
@@ -16,4 +16,4 @@ dependencies = [
 gcbminput = "gcbminputloader.scripts.inputloader:cli"
 
 [tool.hatch.build.targets.wheel.force-include]
-"projectloader/resources" = "gcbminputloader/resources"
+"ProjectLoader/resources" = "gcbminputloader/resources"

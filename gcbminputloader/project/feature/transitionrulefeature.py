@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from collections import defaultdict
 from itertools import chain
@@ -8,9 +9,10 @@ from gcbminputloader.util.db import get_connection
 class TransitionRuleFeature(Feature):
     
     def __init__(
-        self, path, id_col, regen_delay_col, reset_age_col, transition_classifier_mapping,
-        worksheet=None, header=True, reset_age_type_col=None, disturbance_type_col=None,
-        match_classifier_mapping=None
+        self, path: [str, Path], id_col: int, regen_delay_col: int, reset_age_col: int,
+        transition_classifier_mapping: dict[str, int], worksheet: int = None, header: bool = True,
+        reset_age_type_col: int = None, disturbance_type_col: int = None,
+        match_classifier_mapping: dict[str, int] = None
     ):
         self._path = path
         self._id_col = id_col
@@ -18,12 +20,12 @@ class TransitionRuleFeature(Feature):
         self._reset_age_col = reset_age_col
         self._transition_classifier_mapping = transition_classifier_mapping
         self._worksheet = worksheet
-        self._header = header
+        self._header = header if header is not None else True
         self._reset_age_type_col = reset_age_type_col
         self._disturbance_type_col = disturbance_type_col
         self._match_classifier_mapping = match_classifier_mapping
 
-    def create(self, output_connection_string):
+    def create(self, output_connection_string: str):
         logging.info("Loading transition rules...")
         with get_connection(output_connection_string) as output_db:
             transition_rule_data = self._load_data(
@@ -43,16 +45,38 @@ class TransitionRuleFeature(Feature):
                 output_db, transition_id_lookup, classifier_value_lookup, transition_rule_data
             )
 
-    def save(self, config_path):
-        raise NotImplementedError()
+    def save(self, config: Configuration):
+        logging.info("  transition rules")
+        config["transition_rules"] = {
+            "path": config.resolve_working_relative(self._path),
+            "id_col": self._id_col,
+            "reset_age_col": self._reset_age_col,
+            "regen_delay_col": self._regen_delay_col,
+            "classifier_transition_cols": self._transition_classifier_mapping
+        }
+        
+        if self._worksheet is not None:
+            config["transition_rules"]["worksheet"] = self._worksheet
+            
+        if not self._header:
+            config["transition_rules"]["header"] = False
+            
+        if self._reset_age_type_col is not None:
+            config["transition_rules"]["reset_age_type_col"] = self._reset_age_type_col
+            
+        if self._disturbance_type_col is not None:
+            config["transition_rules"]["disturbance_type_col"] = self._disturbance_type_col
+            
+        if self._match_classifier_mapping and any(self._match_classifier_mapping.values()):
+            config["transition_rules"]["classifier_matching_cols"] = self._match_classifier_mapping
 
-    def _load_classifier_values(self, conn, transition_rule_data):
+    def _load_classifier_values(self, conn: Connection, transition_rule_data: DataFrame):
         logging.info("  classifier values")
         unique_classifier_values = {
             classifier_name: transition_rule_data[transition_rule_data.columns[classifier_col]].unique()
             for classifier_name, classifier_col in chain(
                 self._transition_classifier_mapping.items(),
-                self._match_classifier_mapping.items()
+                (self._match_classifier_mapping or {}).items()
             ) if classifier_col is not None
         }
             
@@ -76,7 +100,7 @@ class TransitionRuleFeature(Feature):
             ), [{"classifier_id": classifier_ids[classifier_name], "value": str(value)}
                 for value in chain(classifier_values, ["?"])])
         
-    def _load_transitions(self, conn, transition_rule_data):
+    def _load_transitions(self, conn: Connection, transition_rule_data: DataFrame) -> dict[str, int]:
         logging.info("  base transitions")
         transition_id_lookup = {}
         transition_type_lookup = self._get_transition_type_lookup(conn)
@@ -107,7 +131,8 @@ class TransitionRuleFeature(Feature):
         return transition_id_lookup
 
     def _load_transition_classifier_values(
-        self, conn, transition_id_lookup, classifier_value_lookup, transition_rule_data
+        self, conn: Connection, transition_id_lookup: dict[str, int],
+        classifier_value_lookup: dict[str, dict[str, int]], transition_rule_data: DataFrame
     ):
         logging.info("  transition classifier values")
         for _, transition_data_row in transition_rule_data.iterrows():
@@ -124,7 +149,8 @@ class TransitionRuleFeature(Feature):
             } for classifier, classifier_col in self._transition_classifier_mapping.items()])
 
     def _load_soft_transitions(
-        self, conn, transition_id_lookup, classifier_value_lookup, transition_rule_data
+        self, conn: Connection, transition_id_lookup: dict[str, int],
+        classifier_value_lookup: dict[str, dict[str, int]], transition_rule_data: DataFrame
     ):
         logging.info("  soft transition rules")
         if self._disturbance_type_col is None:
@@ -167,13 +193,13 @@ class TransitionRuleFeature(Feature):
                     classifier_value_lookup[classifier_name][transition_rule_data.iloc[classifier_col]]
             } for classifier_name, classifier_col in self._match_classifier_mapping.items()])
 
-    def _get_transition_type_lookup(self, conn):
+    def _get_transition_type_lookup(self, conn: Connection) -> dict[str, int]:
         return {
             row.name: row.id
             for row in conn.execute(text("SELECT name, id FROM transition_type"))
         }
 
-    def _get_classifier_value_lookup(self, conn):
+    def _get_classifier_value_lookup(self, conn: Connection) -> dict[str, dict[str, int]]:
         classifier_value_lookup = defaultdict(dict)
         for row in conn.execute(text(
             """
@@ -187,7 +213,7 @@ class TransitionRuleFeature(Feature):
 
         return classifier_value_lookup
 
-    def _get_disturbance_type_lookup(self, conn):
+    def _get_disturbance_type_lookup(self, conn: Connection) -> dict[str, int]:
         return {
             row.name.lower(): row.id
             for row in conn.execute(text("SELECT name, id FROM disturbance_type"))

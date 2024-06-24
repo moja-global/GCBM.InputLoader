@@ -1,14 +1,15 @@
+from __future__ import annotations
 import logging
 from sqlalchemy import text
 from gcbminputloader.project.feature.feature import Feature
 from gcbminputloader.util.db import get_connection
 
 class DisturbanceCategoryFeature(Feature):
-    
-    def __init__(self, category_mappings):
+   
+    def __init__(self, category_mappings: dict[str, int]):
         self._category_mappings = category_mappings
 
-    def create(self, output_connection_string):
+    def create(self, output_connection_string: str):
         logging.info("Loading disturbance categories...")
         with get_connection(output_connection_string) as output_db:
             valid_disturbance_types = {
@@ -41,5 +42,6 @@ class DisturbanceCategoryFeature(Feature):
                 ), {"category_id": category_ids[category.lower()],
                     "disturbance_type": disturbance_type})
                 
-    def save(self, config_path):
-        raise NotImplementedError()
+    def save(self, config: Configuration):
+        logging.info("  disturbance categories")
+        config["disturbance_type_categories"] = self._category_mappings

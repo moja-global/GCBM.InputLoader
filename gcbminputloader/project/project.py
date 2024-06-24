@@ -1,3 +1,5 @@
+from __future__ import annotations
+import json
 import logging
 import gcbminputloader
 from pathlib import Path
@@ -7,6 +9,7 @@ from sqlalchemy import text
 from sqlalchemy import insert
 from gcbminputloader.util.json import InputLoaderJson
 from gcbminputloader.util.db import get_connection
+from gcbminputloader.util.configuration import Configuration
 
 class ProjectType(Enum):
 
@@ -15,10 +18,10 @@ class ProjectType(Enum):
     
 class ClassifierMapping(dict):
     
-    def __init__(self, classifiers):
+    def __init__(self, classifiers: list[str]):
         super().__init__({c: None for c in classifiers})
     
-    def map_classifier(self, classifier, col):
+    def map_classifier(self, classifier: str, col: int):
         if classifier not in self:
             raise RuntimeError(f"Unknown classifier: {classifier}")
         
@@ -26,13 +29,13 @@ class ClassifierMapping(dict):
 
 class Project:
     
-    def __init__(self, project_type, aidb_path, classifiers):
+    def __init__(self, project_type: ProjectType, aidb_path: [str, Path], classifiers: list[str]):
         self._project_type = project_type
         self._aidb_path = aidb_path
         self._classifiers = classifiers
         self._features = []
 
-    def create(self, output_connection_string):
+    def create(self, output_connection_string: str):
         logging.debug(f"Loading {output_connection_string} using {self._aidb_path}")
         Path(output_connection_string).unlink(True)
 
@@ -51,22 +54,39 @@ class Project:
         for feature in self._features:
             feature.create(output_connection_string)
     
-    def save(self, config_path):
-        raise NotImplementedError()
+    def save(self, config_path: [str, Path]):
+        config_path = Path(config_path)
 
-    def create_classifier_mapping(self, mappings=None):
+        logging.info(f"Writing configuration to {config_path}...")
+        logging.info("  project configuration")
+        config = Configuration({
+            "project_type": self._project_type.name,
+            "classifiers": self._classifiers
+        }, config_path.parent)
+        
+        config["aidb"] = config.resolve_working_relative(self._aidb_path)
+        
+        feature_config = config.get("features", {})
+        for feature in self._features:
+            feature.save(feature_config)
+        
+        config["features"] = feature_config
+        config.save(config_path)
+
+    def create_classifier_mapping(self, mappings: dict[str, int] = None) -> ClassifierMapping:
         classifier_mapping = ClassifierMapping(self._classifiers)
         for classifier, col in (mappings or {}).items():
             classifier_mapping.map_classifier(classifier, col)
         
         return classifier_mapping
 
-    def add_feature(self, feature):
+    def add_feature(self, feature: Feature):
         self._features.append(feature)
 
-    def _process_loader(self, loader_config_path, aidb, output_db):
+    def _process_loader(self, loader_config_path: [str, Path], aidb: Connection, output_db: Connection):
+        loader_config_path = Path(loader_config_path)
         loader_type, loader_config = next(iter(self._read_loader_config(loader_config_path).items()))
-        loader_name = loader_config.get("name", Path(loader_config_path).name)
+        loader_name = loader_config.get("name", loader_config_path.name)
         logging.info(f"  {loader_name}")
         if loader_type == "InternalLoaderMapping":
             queries = self._parse_sql(
@@ -100,13 +120,13 @@ class Project:
                 [dict(zip(data_cols, row)) for row in loader_config["data"]]
             )
                 
-    def _read_loader_config(self, rel_config_path):
+    def _read_loader_config(self, rel_config_path: Path) -> InputLoaderJson:
         loader_config_path = self._get_resource_path(rel_config_path)
         loader_config = InputLoaderJson(loader_config_path).load()
 
         return loader_config
 
-    def _parse_sql(self, raw_sql):
+    def _parse_sql(self, raw_sql: str) -> list[tuple[str, Iterable[str]]]:
         queries = []
         for sql in raw_sql.replace("@", ":").split(";"):
             if not sql or sql.isspace():
@@ -118,7 +138,7 @@ class Project:
 
         return queries
     
-    def _get_resource_path(self, filename, dialect=None):
+    def _get_resource_path(self, filename: [str, Path], dialect: str = None) -> Path:
         resource_root = Path(gcbminputloader.__file__).parent.joinpath("resources", "loader")
         resource_path = resource_root.joinpath(filename)
         if dialect:

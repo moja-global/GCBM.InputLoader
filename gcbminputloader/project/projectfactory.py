@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import gcbminputloader
 from gcbminputloader.util.configuration import Configuration
@@ -15,7 +16,7 @@ class ConfigurationType(Enum):
 
 class ProjectFactory:
     
-    def load(self, config_path):
+    def load(self, config_path: [str, Path]) -> Project:
         config = Configuration.load(config_path)
         config_type = self._get_config_type(config)
         project_type = self._get_project_type(config)
@@ -28,15 +29,15 @@ class ProjectFactory:
         
         return self._load_project(project_type, config)
         
-    def _load_project(self, project_type, config):
+    def _load_project(self, project_type: ProjectType, config: Configuration) -> Project:
         aidb_path = config.resolve(config["aidb"])
         project = Project(project_type, aidb_path, config["classifiers"])
-        for feature_name, feature_config in config.get("features", {}):
+        for feature_name, feature_config in config.get("features", {}).items():
             project.add_feature(self._build_feature(project, feature_name, feature_config))
 
         return project
     
-    def _load_recliner2gcbm_project(self, project_type, config):
+    def _load_recliner2gcbm_project(self, project_type: ProjectType, config: Configuration) -> Project:
         aidb_path = config.resolve(config["AIDBPath"])
         classifiers = [c["Name"] for c in config["ClassifierSet"]]
         project = Project(project_type, aidb_path, classifiers)
@@ -81,13 +82,13 @@ class ProjectFactory:
 
         return project
     
-    def _get_config_type(self, config):
+    def _get_config_type(self, config: Configuration) -> ConfigurationType:
         if "Project" in config:
             return ConfigurationType.Recliner2Gcbm
         
         return ConfigurationType.GcbmInputLoader
 
-    def _get_project_type(self, config):
+    def _get_project_type(self, config: Configuration) -> ProjectType:
         recliner2gcbm_project_type = config.get("Project", {}).get("Configuration")
         if recliner2gcbm_project_type is not None:
             return (
@@ -97,7 +98,7 @@ class ProjectFactory:
             
         return ProjectType[config["project_type"]]
 
-    def _build_feature(self, project, feature_name, feature_config):
+    def _build_feature(self, project: Project, feature_name: str, feature_config: Configuration) -> Feature:
         if feature_name == "growth_curves":
             logging.debug("Building growth curve feature")
             classifier_mapping = project.create_classifier_mapping(feature_config["classifier_cols"])
