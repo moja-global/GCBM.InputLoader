@@ -1,5 +1,7 @@
 from __future__ import annotations
 import logging
+import numpy as np
+from numbers import Number
 from collections import defaultdict
 from itertools import chain
 from sqlalchemy import text
@@ -79,7 +81,7 @@ class TransitionRuleFeature(Feature):
                 (self._match_classifier_mapping or {}).items()
             ) if classifier_col is not None
         }
-            
+        
         conn.execute(
             text("INSERT INTO classifier (name) VALUES (:name) ON CONFLICT DO NOTHING"),
             [{"name": classifier} for classifier in unique_classifier_values.keys()]
@@ -97,8 +99,11 @@ class TransitionRuleFeature(Feature):
                 VALUES (:classifier_id, :value, :value)
                 ON CONFLICT DO NOTHING
                 """
-            ), [{"classifier_id": classifier_ids[classifier_name], "value": str(value)}
-                for value in chain(classifier_values, ["?"])])
+            ), [
+                {"classifier_id": classifier_ids[classifier_name], "value": str(value)}
+                for value in chain(classifier_values, ["?"])
+                if not (isinstance(value, Number) and np.isnan(value))
+            ])
         
     def _load_transitions(self, conn: Connection, transition_rule_data: DataFrame) -> dict[str, int]:
         logging.info("  base transitions")
@@ -161,7 +166,10 @@ class TransitionRuleFeature(Feature):
         classifier_value_lookup = self._get_classifier_value_lookup(conn)
         for _, transition_data_row in transition_rule_data.iterrows():
             disturbance_type = transition_data_row.iloc[self._disturbance_type_col]
-            if not disturbance_type or (isinstance(disturbance_type, str) and disturbance_type.isspace()):
+            if (not disturbance_type
+                or (not isinstance(disturbance_type, str) and np.isnan(disturbance_type))
+                or (isinstance(disturbance_type, str) and disturbance_type.isspace())
+            ):
                 continue
             
             transition_id = transition_id_lookup[transition_data_row.iloc[self._id_col]]
@@ -182,16 +190,20 @@ class TransitionRuleFeature(Feature):
                 """
             ), {"transition_id": transition_id, "disturbance_type_id": disturbance_type_id}).scalar()
             
-            conn.execute(text(
-                """
-                INSERT INTO transition_rule_classifier_value (transition_rule_id, classifier_value_id)
-                VALUES (:transition_rule_id, :classifier_value_id)
-                """
-            ), [{
-                "transition_rule_id": transition_rule_id,
-                "classifier_value_id":
-                    classifier_value_lookup[classifier_name][transition_rule_data.iloc[classifier_col]]
-            } for classifier_name, classifier_col in self._match_classifier_mapping.items()])
+            for classifier_name, classifier_col in self._match_classifier_mapping.items():
+                classifier_value = transition_data_row.iloc[classifier_col]
+                if not isinstance(classifier_value, str) and np.isnan(classifier_value):
+                    classifier_value = "?"
+                
+                conn.execute(text(
+                    """
+                    INSERT INTO transition_rule_classifier_value (transition_rule_id, classifier_value_id)
+                    VALUES (:transition_rule_id, :classifier_value_id)
+                    """
+                ), {
+                    "transition_rule_id": transition_rule_id,
+                    "classifier_value_id": classifier_value_lookup[classifier_name][classifier_value]
+                })
 
     def _get_transition_type_lookup(self, conn: Connection) -> dict[str, int]:
         return {

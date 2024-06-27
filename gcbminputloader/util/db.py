@@ -1,9 +1,13 @@
 import urllib
 import psutil
+import warnings
 from pathlib import Path
 from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy import text
+from sqlalchemy.exc import SAWarning
+
+warnings.filterwarnings("ignore", category=SAWarning)
 
 @contextmanager
 def get_connection(connection_string):

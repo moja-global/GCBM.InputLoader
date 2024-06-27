@@ -16,7 +16,7 @@ class ConfigurationType(Enum):
 
 class ProjectFactory:
     
-    def load(self, config_path: [str, Path]) -> Project:
+    def from_config_file(self, config_path: [str, Path]) -> Project:
         config = Configuration.load(config_path)
         config_type = self._get_config_type(config)
         project_type = self._get_project_type(config)
@@ -27,9 +27,9 @@ class ProjectFactory:
         if config_type == ConfigurationType.Recliner2Gcbm:
             return self._load_recliner2gcbm_project(project_type, config)
         
-        return self._load_project(project_type, config)
+        return self.from_config(project_type, config)
         
-    def _load_project(self, project_type: ProjectType, config: Configuration) -> Project:
+    def from_config(self, project_type: ProjectType, config: Configuration) -> Project:
         aidb_path = config.resolve(config["aidb"])
         project = Project(project_type, aidb_path, config["classifiers"])
         for feature_name, feature_config in config.get("features", {}).items():

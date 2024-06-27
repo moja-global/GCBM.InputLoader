@@ -33,5 +33,5 @@ def cli():
     logging.info(f"Creating {args.output_path} from {args.config}")
     logging.info(f"Log: {log_path}")
     
-    project = ProjectFactory().load(args.config)
+    project = ProjectFactory().from_config_file(args.config)
     project.create(args.output_path)
