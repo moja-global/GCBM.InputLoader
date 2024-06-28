@@ -93,6 +93,7 @@ class ProjectFactory:
         if recliner2gcbm_project_type is not None:
             return (
                 ProjectType.LegacyGcbmClassicSpatialNoGrowthCurves if recliner2gcbm_project_type == 1
+                else ProjectType.GcbmClassicSpatial if config.get("aidb").suffix == ".db"
                 else ProjectType.LegacyGcbmClassicSpatial
             )
             

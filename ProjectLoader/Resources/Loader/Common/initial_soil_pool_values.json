@@ -1,19 +1,30 @@
 ﻿{
     "SQLLoaderMapping": {
-        "name": "Decay (DOM) parameters",
+        "name": "Non-forest soil pool values",
         "fetch_sql": "
             SELECT
-                p_tr.gcbm_pool_name AS SoilPoolName,
-                d.base_decay_rate AS OrganicMatterDecayRate,
-                d.reference_temp AS ReferenceTemp,
-                d.q10 AS Q10,
-                d.prop_to_atmosphere AS PropToAtmosphere,
-                d.max_rate AS MaxDecayRate
-            FROM decay_parameter d
-            INNER JOIN dom_pool dp
-                ON d.dom_pool_id = dp.id
+                a_tr.name AS Admin,
+                e_tr.name AS Eco,
+                st_tr.name AS SoilType,
+                p_tr.gcbm_pool_name AS PoolName,
+                s.value AS SoilC
+            FROM afforestation_initial_pool s
+            INNER JOIN afforestation_pre_type st
+                ON s.afforestation_pre_type_id = st.id
+            INNER JOIN afforestation_pre_type_tr st_tr
+                ON st.id = st_tr.afforestation_pre_type_id
+            INNER JOIN spatial_unit spu
+                ON s.spatial_unit_id = spu.id
+            INNER JOIN admin_boundary a
+                ON spu.admin_boundary_id = a.id
+            INNER JOIN admin_boundary_tr a_tr
+                ON a.id = a_tr.admin_boundary_id
+            INNER JOIN eco_boundary e
+                ON spu.eco_boundary_id = e.id
+            INNER JOIN eco_boundary_tr e_tr
+                ON e.id = e_tr.eco_boundary_id
             INNER JOIN pool p
-                ON dp.pool_id = p.id
+                ON s.pool_id = p.id
             INNER JOIN (
                 SELECT
                     p.id AS pool_id,
@@ -47,25 +58,25 @@
                     ON p.id = p_tr.pool_id
                 WHERE p_tr.locale_id = 1
             ) AS p_tr
-                ON p.id = p_tr.pool_id",
+                ON p.id = p_tr.pool_id
+            WHERE a_tr.locale_id = 1
+                AND e_tr.locale_id = 1
+                AND st_tr.locale_id = 1",
         "load_sql": "
-            INSERT INTO decay_parameter (
-                dom_pool_id,
-                base_decay_rate,
-                reference_temp,
-                q10,
-                prop_to_atmosphere,
-                max_rate)
+            INSERT INTO soil (spatial_unit_id, soil_type_id, pool_id, value)
             SELECT
-                dp.id,
-                @OrganicMatterDecayRate AS OrganicMatterDecayRate,
-                @ReferenceTemp AS ReferenceTemp,
-                @Q10 AS Q10,
-                @PropToAtmosphere AS PropToAtmosphere,
-                @MaxDecayRate AS MaxDecayRate
-            FROM dom_pool dp
-            INNER JOIN pool p
-                ON dp.pool_id = p.id
-            WHERE p.name = @SoilPoolName"
+                spu.id,
+                st.id,
+                p.id,
+                @SoilC AS value
+            FROM soil_type st, pool p, spatial_unit spu
+            INNER JOIN admin_boundary a
+                ON a.name = @Admin
+                AND spu.admin_boundary_id = a.id
+            INNER JOIN eco_boundary e
+                ON e.name = @Eco
+                AND spu.eco_boundary_id = e.id
+            WHERE st.name = @SoilType
+                AND p.name = @PoolName"
     }
 }

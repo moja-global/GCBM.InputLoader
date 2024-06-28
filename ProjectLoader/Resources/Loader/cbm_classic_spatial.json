@@ -29,6 +29,8 @@
     "Common/growth_multiplier_values.json",
     "Common/growth_multiplier_associations.json",
     "Common/turnover_parameter_associations.json",
+    "Common/soil_types.json",
+    "Common/initial_soil_pool_values.json",
     "ClassifierLoader",
     "GrowthCurveLoader",
     "TransitionLoader",

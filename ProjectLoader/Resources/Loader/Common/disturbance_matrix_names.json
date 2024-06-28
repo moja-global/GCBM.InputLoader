@@ -1,7 +1,12 @@
 ﻿{
     "SQLLoaderMapping": {
         "name": "Disturbance matrix names",
-        "fetch_sql": "SELECT name AS DMName FROM disturbance_matrix",
+        "fetch_sql": "
+            SELECT dm.id || '_' || name AS DMName
+            FROM disturbance_matrix dm
+            INNER JOIN disturbance_matrix_tr dm_tr
+                ON dm.id = dm_tr.disturbance_matrix_id
+            WHERE dm_tr.locale_id = 1",
         "load_sql": "INSERT INTO disturbance_matrix (name) VALUES (@DMName)"
     }
 }

@@ -3,15 +3,29 @@
         "name": "Growth multiplier values",
         "fetch_sql": "
             SELECT
-                gm.description AS SeriesName,
-                ft.name AS ForestTypeName,
+                dt_tr.name AS SeriesName,
                 gmv.time_step AS TimeStep,
-                gmv.value AS GrowthMultiplier
-            FROM growth_multiplier_value gmv
-            INNER JOIN growth_multiplier_series gm
-                ON gmv.growth_multiplier_series_id = gm.id
+                gmv.value AS GrowthMultiplier,
+                ft_tr.name AS ForestTypeName
+            FROM growth_multiplier_series gm
+            INNER JOIN growth_multiplier_value gmv
+                ON gm.id = gmv.growth_multiplier_series_id
+            INNER JOIN disturbance_type dt
+                ON gm.disturbance_type_id = dt.id
+            INNER JOIN disturbance_type_tr dt_tr
+                ON dt.id = dt_tr.disturbance_type_id
             INNER JOIN forest_type ft
-                ON gmv.forest_type_id = ft.id",
+                ON gmv.forest_type_id = ft.id
+            INNER JOIN forest_type_tr ft_tr
+                ON ft.id = ft_tr.forest_type_id
+            WHERE gmv.value <> 1
+                AND dt_tr.locale_id = 1
+                AND ft_tr.locale_id = 1
+            GROUP BY
+                dt_tr.name,
+                gmv.time_step,
+                gmv.value,
+                ft_tr.name",
         "load_sql": "
             INSERT INTO growth_multiplier_value (
                 growth_multiplier_series_id,

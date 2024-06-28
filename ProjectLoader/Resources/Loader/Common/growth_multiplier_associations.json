@@ -2,14 +2,16 @@
     "SQLLoaderMapping": {
         "name": "Growth multiplier associations",
         "fetch_sql": "
-            SELECT
-                dt.name AS DistTypeName,
-                gm.description AS GrowthMultiplierSeries
-            FROM disturbance_type_growth_multiplier_series dt_gm
+            SELECT DISTINCT dt_tr.name AS DistTypeName
+            FROM growth_multiplier_series gm
+            INNER JOIN growth_multiplier_value gmv
+                ON gm.id = gmv.growth_multiplier_series_id
             INNER JOIN disturbance_type dt
-                ON dt_gm.disturbance_type_id = dt.id
-            INNER JOIN growth_multiplier_series gm
-                ON dt_gm.growth_multiplier_series_id = gm.id",
+                ON gm.disturbance_type_id = dt.id
+            INNER JOIN disturbance_type_tr dt_tr
+                ON dt.id = dt_tr.disturbance_type_id
+            WHERE gmv.value <> 1
+                AND dt_tr.locale_id = 1",
         "load_sql": "
             INSERT INTO growth_multiplier_series_association (
                 disturbance_type_id,
@@ -20,6 +22,6 @@
             FROM disturbance_type dt,
                  growth_multiplier_series gm
             WHERE dt.name = @DistTypeName
-                AND gm.description = @GrowthMultiplierSeries"
+                AND gm.description = @DistTypeName"
     }
 }

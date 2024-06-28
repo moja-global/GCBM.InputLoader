@@ -1,0 +1,12 @@
+﻿{
+    "SQLLoaderMapping": {
+        "name": "Soil types",
+        "fetch_sql": "
+            SELECT DISTINCT name AS SoilType
+            FROM afforestation_pre_type_tr
+            WHERE locale_id = 1",
+        "load_sql": "
+            INSERT INTO soil_type (name)
+            VALUES (@SoilType)"
+    }
+}

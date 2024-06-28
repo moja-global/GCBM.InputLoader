@@ -2,8 +2,11 @@
     "SQLLoaderMapping": {
         "name": "Eco boundaries",
         "fetch_sql": "
-            SELECT e.name AS EcoBoundaryName
-            FROM eco_boundary e",
+            SELECT e_tr.name AS EcoBoundaryName
+            FROM eco_boundary e
+            INNER JOIN eco_boundary_tr e_tr
+                ON e.id = e_tr.eco_boundary_id
+            WHERE locale_id = 1",
         "load_sql": "
             INSERT INTO eco_boundary (
                 eco_region_id,

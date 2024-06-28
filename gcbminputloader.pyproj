@@ -37,6 +37,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="gcbminputloader\util\configuration.py" />
+    <Compile Include="gcbminputloader\util\db.py" />
     <Compile Include="gcbminputloader\util\json.py" />
     <Compile Include="gcbminputloader\util\__init__.py">
       <SubType>Code</SubType>

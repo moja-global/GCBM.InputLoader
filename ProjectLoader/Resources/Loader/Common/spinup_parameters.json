@@ -4,7 +4,8 @@
         "fetch_sql": "
             SELECT
                 historic_mean_temperature AS MeanAnnualTemp,
-                return_interval AS ReturnInterval
+                return_interval AS ReturnInterval,
+                max_rotations AS MaxRotations
             FROM spinup_parameter",
         "load_sql": "
             INSERT INTO spinup_parameter (
@@ -15,7 +16,7 @@
             SELECT
                 dt.id,
                 @ReturnInterval AS return_interval,
-                30 AS max_rotations,
+                @MaxRotations AS max_rotations,
                 @MeanAnnualTemp AS mean_annual_temperature
             FROM disturbance_type dt
             WHERE dt.name = 'Wild Fire'

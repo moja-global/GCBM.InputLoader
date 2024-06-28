@@ -10,7 +10,8 @@ from sqlalchemy.exc import SAWarning
 warnings.filterwarnings("ignore", category=SAWarning)
 
 @contextmanager
-def get_connection(connection_string):
+def get_connection(connection_string, optimize=False):
+    connection_string = str(connection_string)
     connection_url = "sqlite://"
     schema = None
     if connection_string.startswith("postgresql"):
@@ -51,7 +52,7 @@ def get_connection(connection_string):
                 
                 yield conn
                 
-            if "sqlite" in connection_url:
+            if "sqlite" in connection_url and optimize:
                 conn.execute(text("PRAGMA analysis_limit=1000"))
                 conn.execute(text("PRAGMA optimize"))
                 

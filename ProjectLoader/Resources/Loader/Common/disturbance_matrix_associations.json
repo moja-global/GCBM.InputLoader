@@ -3,21 +3,33 @@
         "name": "Disturbance matrix associations",
         "fetch_sql": "
             SELECT
-                a.name AS AdminBoundaryName,
-                e.name AS EcoBoundaryName,
-                dt.name AS DistTypeName,
-                dm.name AS DMName
+                a_tr.name AS AdminBoundaryName,
+                e_tr.name AS EcoBoundaryName,
+                dt_tr.name AS DistTypeName,
+                dm.id || '_' || dm_tr.name AS DMName
             FROM disturbance_matrix_association dma
             INNER JOIN spatial_unit spu
                 ON dma.spatial_unit_id = spu.id
             INNER JOIN eco_boundary e
                 ON spu.eco_boundary_id = e.id
+            INNER JOIN eco_boundary_tr e_tr
+                ON e.id = e_tr.eco_boundary_id
             INNER JOIN admin_boundary a
                 ON spu.admin_boundary_id = a.id
+            INNER JOIN admin_boundary_tr a_tr
+                ON a.id = a_tr.admin_boundary_id
             INNER JOIN disturbance_type dt
                 ON dma.disturbance_type_id = dt.id
+            INNER JOIN disturbance_type_tr dt_tr
+                ON dt.id = dt_tr.disturbance_type_id
             INNER JOIN disturbance_matrix dm
-                ON dma.disturbance_matrix_id = dm.id",
+                ON dma.disturbance_matrix_id = dm.id
+            INNER JOIN disturbance_matrix_tr dm_tr
+                ON dm.id = dm_tr.disturbance_matrix_id
+            WHERE e_tr.locale_id = 1
+                AND a_tr.locale_id = 1
+                AND dt_tr.locale_id = 1
+                AND dm_tr.locale_id = 1",
         "load_sql": "
             INSERT INTO disturbance_matrix_association (
                 spatial_unit_id,
@@ -34,9 +46,9 @@
                 ON spu.admin_boundary_id = a.id
             INNER JOIN eco_boundary e
                 ON spu.eco_boundary_id = e.id
-            WHERE a.name = @adminboundaryname
-                AND e.name = @ecoboundaryname
-                AND dt.name = @disttypename
-                AND dm.name = @dmname"
+            WHERE a.name = @AdminBoundaryName
+                AND e.name = @EcoBoundaryName
+                AND dt.name = @DistTypeName
+                AND dm.name = @DMName"
     }
 }

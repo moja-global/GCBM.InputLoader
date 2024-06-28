@@ -3,14 +3,23 @@
         "name": "Species types",
         "fetch_sql": "
             SELECT
-                s.name AS SpeciesTypeName,
-                f.name AS ForestTypeName,
-                g.name AS GenusName
+                s_tr.name AS SpeciesTypeName,
+                f_tr.name AS ForestTypeName,
+                g_tr.name AS GenusName
             FROM species s
+            INNER JOIN species_tr s_tr
+                ON s.id = s_tr.species_id
             INNER JOIN forest_type f
                 ON s.forest_type_id = f.id
+            INNER JOIN forest_type_tr f_tr
+                ON f.id = f_tr.forest_type_id
             INNER JOIN genus g
-                ON s.genus_id = g.id",
+                ON s.genus_id = g.id
+            INNER JOIN genus_tr g_tr
+                ON g.id = g_tr.genus_id
+            WHERE s_tr.locale_id = 1
+                AND f_tr.locale_id = 1
+                AND g_tr.locale_id = 1",
         "load_sql": "
             INSERT INTO species (
                 forest_type_id,

@@ -1,6 +1,6 @@
 ﻿{
     "SQLLoaderMapping": {
-        "name": "Species types",
+        "name": "Custom pool types",
         "fetch_sql": "
             SELECT DISTINCT Description AS PoolName
             FROM tblSinkName

@@ -3,7 +3,7 @@
         "name": "Volume to biomass parameters",
         "fetch_sql": "
             SELECT DISTINCT
-                A, B, a_nonmerch, b_nonmerch, k_nonmerch, cap_nonmerch, a_sap, b_sap, k_sap,
+                a, b, a_nonmerch, b_nonmerch, k_nonmerch, cap_nonmerch, a_sap, b_sap, k_sap,
                 cap_sap, a1, a2, a3, b1, b2, b3, c1, c2, c3, min_volume, max_volume,
                 low_stemwood_prop, high_stemwood_prop, low_stembark_prop, high_stembark_prop,
                 low_branches_prop, high_branches_prop, low_foliage_prop, high_foliage_prop
@@ -15,7 +15,7 @@
                 low_stemwood_prop, high_stemwood_prop, low_stembark_prop, high_stembark_prop,
                 low_branches_prop, high_branches_prop, low_foliage_prop, high_foliage_prop)
             VALUES (
-                @A, @B, @a_nonmerch, @b_nonmerch, @k_nonmerch, @cap_nonmerch, @a_sap, @b_sap,
+                @a, @b, @a_nonmerch, @b_nonmerch, @k_nonmerch, @cap_nonmerch, @a_sap, @b_sap,
                 @k_sap, @cap_sap, @a1, @a2, @a3, @b1, @b2, @b3, @c1, @c2, @c3, @min_volume,
                 @max_volume, @low_stemwood_prop, @high_stemwood_prop, @low_stembark_prop,
                 @high_stembark_prop, @low_branches_prop, @high_branches_prop, @low_foliage_prop,

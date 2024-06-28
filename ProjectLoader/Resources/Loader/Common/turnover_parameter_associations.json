@@ -3,13 +3,13 @@
         "name": "Turnover parameters",
         "fetch_sql": "
             SELECT DISTINCT
-                e.name AS EcoBoundaryName,
-                g.name AS GenusName,
+                e_tr.name AS EcoBoundaryName,
+                hw_genus.GenusName AS GenusName,
                 hw_foliage AS foliage,
                 stem_turnover AS stem,
                 hw_branch AS branch,
-                stem_snag,
-                branch_snag,
+                hw_stem_snag AS stem_snag,
+                hw_branch_snag AS branch_snag,
                 coarse_root,
                 fine_root,
                 branch_snag_split,
@@ -17,29 +17,38 @@
                 fine_ag_split
             FROM (
                 eco_boundary e
+                INNER JOIN eco_boundary_tr e_tr
+                    ON e.id = e_tr.eco_boundary_id
                 INNER JOIN turnover_parameter p
                     ON e.turnover_parameter_id = p.id
             ), (
                 SELECT
-                    IIF(f.name LIKE 'Mixedwood', 'Hardwood', f.name) AS ForestTypeName,
-                    g.name
-                FROM forest_type f
-                INNER JOIN (
-                    genus g
-                    INNER JOIN species s
-                        ON s.genus_id = g.id
-                ) ON s.forest_type_id = f.id
-                WHERE f.name IN ('Hardwood', 'Mixedwood')
-            )
+                    CASE WHEN f_tr.name LIKE 'Mixedwood' THEN 'Hardwood' ELSE f_tr.name END AS ForestTypeName,
+                    g_tr.name AS GenusName
+                FROM genus g
+                INNER JOIN genus_tr g_tr
+                    ON g.id = g_tr.genus_id
+                INNER JOIN species s
+                    ON s.genus_id = g.id
+                INNER JOIN forest_type f
+                    ON s.forest_type_id = f.id
+                INNER JOIN forest_type_tr f_tr
+                    ON f.id = f_tr.forest_type_id
+                WHERE f_tr.name IN ('Hardwood', 'Mixedwood')
+                    AND LOWER(g_tr.name) NOT LIKE '%missing value%'
+                    AND g_tr.locale_id = 1
+                    AND f_tr.locale_id = 1
+            ) AS hw_genus
+            WHERE e_tr.locale_id = 1
             UNION
             SELECT DISTINCT
-                e.name AS EcoBoundaryName,
-                g.name AS GenusName,
+                e_tr.name AS EcoBoundaryName,
+                sw_genus.GenusName AS GenusName,
                 sw_foliage AS foliage,
                 stem_turnover AS stem,
                 sw_branch AS branch,
-                stem_snag,
-                branch_snag,
+                sw_stem_snag AS stem_snag,
+                sw_branch_snag AS branch_snag,
                 coarse_root,
                 fine_root,
                 branch_snag_split,
@@ -47,20 +56,29 @@
                 fine_ag_split
             FROM (
                 eco_boundary e
+                INNER JOIN eco_boundary_tr e_tr
+                    ON e.id = e_tr.eco_boundary_id
                 INNER JOIN turnover_parameter p
                     ON e.turnover_parameter_id = p.id
             ), (
                 SELECT
-                    f.name AS ForestTypeName,
-                    g.name
-                FROM forest_type f
-                INNER JOIN (
-                    genus g
-                    INNER JOIN species s
-                        ON s.genus_id = g.id
-                ) ON s.forest_type_id = f.id
-                WHERE f.name = 'Softwood'
-            )",
+                    f_tr.name AS ForestTypeName,
+                    g_tr.name AS GenusName
+                FROM genus g
+                INNER JOIN genus_tr g_tr
+                    ON g.id = g_tr.genus_id
+                INNER JOIN species s
+                    ON s.genus_id = g.id
+                INNER JOIN forest_type f
+                    ON s.forest_type_id = f.id
+                INNER JOIN forest_type_tr f_tr
+                    ON f.id = f_tr.forest_type_id
+                WHERE f_tr.name = 'Softwood'
+                    AND LOWER(g_tr.name) NOT LIKE '%missing value%'
+                    AND g_tr.locale_id = 1
+                    AND f_tr.locale_id = 1
+            ) AS sw_genus
+            WHERE e_tr.locale_id = 1",
         "load_sql": "
             INSERT INTO turnover_parameter_association (genus_id, eco_boundary_id, turnover_parameter_id)
             SELECT

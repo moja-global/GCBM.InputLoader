@@ -3,19 +3,22 @@
         "name": "Disturbance types",
         "fetch_sql": "
             SELECT
-                dt.name AS DistTypeName,
-                dt.code AS DistTypeCode,
-                lc.code AS LandClass
+                dt_tr.name AS DistTypeName,
+                dt.id AS DistTypeCode,
+                lt.land_type AS LandClass
             FROM disturbance_type dt
-            LEFT JOIN land_class lc
-                ON dt.transition_land_class_id = lc.id",
+            INNER JOIN disturbance_type_tr dt_tr
+                ON dt.id = dt_tr.disturbance_type_id
+            LEFT JOIN land_type lt
+                ON dt.land_type_id = lt.id
+            WHERE locale_id = 1",
         "load_sql": "
             INSERT INTO disturbance_type (name, code, transition_land_class_id, disturbance_category_id)
             SELECT DISTINCT
                 @DistTypeName AS name,
                 @DistTypeCode AS code,
                 (SELECT lc.id FROM land_class lc WHERE lc.code = @LandClass) AS land_class_id,
-				(SELECT dc.id FROM disturbance_category dc WHERE dc.code = 'A') AS disturbance_category_id
+                (SELECT dc.id FROM disturbance_category dc WHERE dc.code = 'A') AS disturbance_category_id
             FROM land_class"
     }
 }

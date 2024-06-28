@@ -1,7 +1,12 @@
 ﻿{
     "SQLLoaderMapping": {
         "name": "Genus types",
-        "fetch_sql": "SELECT name AS GenusName FROM genus",
+        "fetch_sql": "
+            SELECT name AS GenusName
+            FROM genus g
+            INNER JOIN genus_tr g_tr
+                ON g.id = g_tr.genus_id
+            WHERE g_tr.locale_id = 1",
         "load_sql": "INSERT INTO genus (name) VALUES (@GenusName)"
     }
 }

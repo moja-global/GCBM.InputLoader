@@ -1,7 +1,12 @@
 ﻿{
     "SQLLoaderMapping": {
         "name": "Forest types",
-        "fetch_sql": "SELECT name AS ForestTypeName FROM forest_type",
+        "fetch_sql": "
+            SELECT name AS ForestTypeName
+            FROM forest_type ft
+            INNER JOIN forest_type_tr ft_tr
+                ON ft.id = ft_tr.forest_type_id
+            WHERE ft_tr.locale_id = 1",
         "load_sql": "INSERT INTO forest_type (name) VALUES (@ForestTypeName)"
     }
 }

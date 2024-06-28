@@ -13,6 +13,7 @@ from gcbminputloader.util.configuration import Configuration
 
 class ProjectType(Enum):
 
+    GcbmClassicSpatial = "cbm_classic_spatial"
     LegacyGcbmClassicSpatial = "legacy_cbm_classic_spatial"
     LegacyGcbmClassicSpatialNoGrowthCurves = "legacy_cbm_classic_spatial_no_gc_tables"
     
@@ -41,7 +42,7 @@ class Project:
 
         with (
             get_connection(str(self._aidb_path)) as aidb,
-            get_connection(output_connection_string) as output_db
+            get_connection(output_connection_string, optimize=True) as output_db
         ):
             logging.info("Loading default parameters...")
             project_loader_config = self._read_loader_config(f"{self._project_type.value}.json")

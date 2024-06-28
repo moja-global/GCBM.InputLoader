@@ -3,7 +3,7 @@
         "name": "Volume to biomass parameter associations",
         "fetch_sql": "
             SELECT
-                a.name AS AdminBoundaryName, e.name AS EcoBoundaryName, sp.name AS SpeciesTypeName,
+                a_tr.name AS AdminBoundaryName, e_tr.name AS EcoBoundaryName, sp_tr.name AS SpeciesTypeName,
                 all_v2b_params.A, all_v2b_params.B, all_v2b_params.a_nonmerch, all_v2b_params.b_nonmerch,
                 all_v2b_params.k_nonmerch, all_v2b_params.cap_nonmerch, all_v2b_params.a_sap,
                 all_v2b_params.b_sap, all_v2b_params.k_sap, all_v2b_params.cap_sap, all_v2b_params.a1,
@@ -77,10 +77,19 @@
                 ON all_v2b_params.spatial_unit_id = s.id
             INNER JOIN admin_boundary a
                 ON s.admin_boundary_id = a.id
+            INNER JOIN admin_boundary_tr a_tr
+                ON a.id = a_tr.admin_boundary_id
             INNER JOIN eco_boundary e
                 ON s.eco_boundary_id = e.id
+            INNER JOIN eco_boundary_tr e_tr
+                ON e.id = e_tr.eco_boundary_id
             INNER JOIN species sp
-                ON all_v2b_params.species_id = sp.id ",
+                ON all_v2b_params.species_id = sp.id
+            INNER JOIN species_tr sp_tr
+                ON sp.id = sp_tr.species_id
+            WHERE a_tr.locale_id = 1
+                AND e_tr.locale_id = 1
+                AND sp_tr.locale_id = 1",
         "load_sql": "
             INSERT INTO vol_to_bio_factor_association (
                 spatial_unit_id,

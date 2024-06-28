@@ -3,17 +3,88 @@
         "name": "Disturbance matrix values",
         "fetch_sql": "
             SELECT
-                dm.name AS DMName,
-                src.name AS SourcePoolName,
-                snk.name AS SinkPoolName,
+                dm.id || '_' || dm_tr.name AS DMName,
+                src_tr.gcbm_pool_name AS SourcePoolName,
+                snk_tr.gcbm_pool_name AS SinkPoolName,
                 dmv.proportion AS Proportion
             FROM disturbance_matrix dm
+            INNER JOIN disturbance_matrix_tr dm_tr
+                ON dm.id = dm_tr.disturbance_matrix_id
             INNER JOIN disturbance_matrix_value dmv
                 ON dmv.disturbance_matrix_id = dm.id
             INNER JOIN pool src
                 ON dmv.source_pool_id = src.id
+            INNER JOIN (
+                SELECT
+                    p.id AS pool_id,
+                    p_tr.name AS cbm_defaults_pool_name,
+                    CASE
+                        WHEN p_tr.name = 'Softwood Merchantable' THEN 'SoftwoodMerch'
+                        WHEN p_tr.name = 'Softwood Foliage' THEN 'SoftwoodFoliage'
+                        WHEN p_tr.name = 'Softwood Other' THEN 'SoftwoodOther'
+                        WHEN p_tr.name = 'Softwood Coarse Roots' THEN 'SoftwoodCoarseRoots'
+                        WHEN p_tr.name = 'Softwood Fine Roots' THEN 'SoftwoodFineRoots'
+                        WHEN p_tr.name = 'Hardwood Merchantable' THEN 'HardwoodMerch'
+                        WHEN p_tr.name = 'Hardwood Foliage' THEN 'HardwoodFoliage'
+                        WHEN p_tr.name = 'Hardwood Other' THEN 'HardwoodOther'
+                        WHEN p_tr.name = 'Hardwood Coarse roots' THEN 'HardwoodCoarseRoots'
+                        WHEN p_tr.name = 'Hardwood Fine Roots' THEN 'HardwoodFineRoots'
+                        WHEN p_tr.name = 'Aboveground Very Fast DOM' THEN 'AboveGroundVeryFastSoil'
+                        WHEN p_tr.name = 'Belowground Very Fast DOM' THEN 'BelowGroundVeryFastSoil'
+                        WHEN p_tr.name = 'Aboveground Fast DOM' THEN 'AboveGroundFastSoil'
+                        WHEN p_tr.name = 'Belowground Fast DOM' THEN 'BelowGroundFastSoil'
+                        WHEN p_tr.name = 'Medium DOM' THEN 'MediumSoil'
+                        WHEN p_tr.name = 'Aboveground Slow DOM' THEN 'AboveGroundSlowSoil'
+                        WHEN p_tr.name = 'Belowground Slow DOM' THEN 'BelowGroundSlowSoil'
+                        WHEN p_tr.name = 'Softwood Stem Snag' THEN 'SoftwoodStemSnag'
+                        WHEN p_tr.name = 'Softwood Branch Snag' THEN 'SoftwoodBranchSnag'
+                        WHEN p_tr.name = 'Hardwood Stem Snag' THEN 'HardwoodStemSnag'
+                        WHEN p_tr.name = 'Hardwood Branch Snag' THEN 'HardwoodBranchSnag'
+                        ELSE p_tr.name
+                    END AS gcbm_pool_name
+                FROM pool p
+                INNER JOIN pool_tr p_tr
+                    ON p.id = p_tr.pool_id
+                WHERE p_tr.locale_id = 1
+            ) AS src_tr
+                ON src.id = src_tr.pool_id
             INNER JOIN pool snk
-                ON dmv.sink_pool_id = snk.id",
+                ON dmv.sink_pool_id = snk.id
+            INNER JOIN (
+                SELECT
+                    p.id AS pool_id,
+                    p_tr.name AS cbm_defaults_pool_name,
+                    CASE
+                        WHEN p_tr.name = 'Softwood Merchantable' THEN 'SoftwoodMerch'
+                        WHEN p_tr.name = 'Softwood Foliage' THEN 'SoftwoodFoliage'
+                        WHEN p_tr.name = 'Softwood Other' THEN 'SoftwoodOther'
+                        WHEN p_tr.name = 'Softwood Coarse Roots' THEN 'SoftwoodCoarseRoots'
+                        WHEN p_tr.name = 'Softwood Fine Roots' THEN 'SoftwoodFineRoots'
+                        WHEN p_tr.name = 'Hardwood Merchantable' THEN 'HardwoodMerch'
+                        WHEN p_tr.name = 'Hardwood Foliage' THEN 'HardwoodFoliage'
+                        WHEN p_tr.name = 'Hardwood Other' THEN 'HardwoodOther'
+                        WHEN p_tr.name = 'Hardwood Coarse roots' THEN 'HardwoodCoarseRoots'
+                        WHEN p_tr.name = 'Hardwood Fine Roots' THEN 'HardwoodFineRoots'
+                        WHEN p_tr.name = 'Aboveground Very Fast DOM' THEN 'AboveGroundVeryFastSoil'
+                        WHEN p_tr.name = 'Belowground Very Fast DOM' THEN 'BelowGroundVeryFastSoil'
+                        WHEN p_tr.name = 'Aboveground Fast DOM' THEN 'AboveGroundFastSoil'
+                        WHEN p_tr.name = 'Belowground Fast DOM' THEN 'BelowGroundFastSoil'
+                        WHEN p_tr.name = 'Medium DOM' THEN 'MediumSoil'
+                        WHEN p_tr.name = 'Aboveground Slow DOM' THEN 'AboveGroundSlowSoil'
+                        WHEN p_tr.name = 'Belowground Slow DOM' THEN 'BelowGroundSlowSoil'
+                        WHEN p_tr.name = 'Softwood Stem Snag' THEN 'SoftwoodStemSnag'
+                        WHEN p_tr.name = 'Softwood Branch Snag' THEN 'SoftwoodBranchSnag'
+                        WHEN p_tr.name = 'Hardwood Stem Snag' THEN 'HardwoodStemSnag'
+                        WHEN p_tr.name = 'Hardwood Branch Snag' THEN 'HardwoodBranchSnag'
+                        ELSE p_tr.name
+                    END AS gcbm_pool_name
+                FROM pool p
+                INNER JOIN pool_tr p_tr
+                    ON p.id = p_tr.pool_id
+                WHERE p_tr.locale_id = 1
+            ) AS snk_tr
+                ON snk.id = snk_tr.pool_id
+            WHERE dm_tr.locale_id = 1",
         "load_sql": "
             INSERT INTO disturbance_matrix_value (
                 disturbance_matrix_id,

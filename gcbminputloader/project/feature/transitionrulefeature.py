@@ -29,7 +29,7 @@ class TransitionRuleFeature(Feature):
 
     def create(self, output_connection_string: str):
         logging.info("Loading transition rules...")
-        with get_connection(output_connection_string) as output_db:
+        with get_connection(output_connection_string, optimize=True) as output_db:
             transition_rule_data = self._load_data(
                 self._path, self._header, sheet_name=self._worksheet
             )

@@ -1,7 +1,17 @@
 ﻿{
     "SQLLoaderMapping": {
         "name": "Growth multiplier series",
-        "fetch_sql": "SELECT description FROM growth_multiplier_series",
-        "load_sql": "INSERT INTO growth_multiplier_series (description) VALUES (@description)"
+        "fetch_sql": "
+            SELECT DISTINCT dt_tr.name AS Description
+            FROM growth_multiplier_series gm
+            INNER JOIN growth_multiplier_value gmv
+                ON gm.id = gmv.growth_multiplier_series_id
+            INNER JOIN disturbance_type dt
+                ON gm.disturbance_type_id = dt.id
+            INNER JOIN disturbance_type_tr dt_tr
+                ON dt.id = dt_tr.disturbance_type_id
+            WHERE gmv.value <> 1
+                AND dt_tr.locale_id = 1",
+        "load_sql": "INSERT INTO growth_multiplier_series (description) VALUES (@Description)"
     }
 }

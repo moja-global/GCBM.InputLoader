@@ -11,7 +11,7 @@ class DisturbanceCategoryFeature(Feature):
 
     def create(self, output_connection_string: str):
         logging.info("Loading disturbance categories...")
-        with get_connection(output_connection_string) as output_db:
+        with get_connection(output_connection_string, optimize=True) as output_db:
             valid_disturbance_types = {
                 row.name.lower()
                 for row in output_db.execute(text("SELECT name FROM disturbance_type"))
