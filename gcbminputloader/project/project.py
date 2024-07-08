@@ -40,17 +40,14 @@ class Project:
         logging.debug(f"Loading {output_connection_string} using {self._aidb_path}")
         Path(output_connection_string).unlink(True)
 
-        with (
-            get_connection(str(self._aidb_path)) as aidb,
-            get_connection(output_connection_string, optimize=True) as output_db
-        ):
+        with get_connection(output_connection_string, optimize=True) as output_db:
             logging.info("Loading default parameters...")
             project_loader_config = self._read_loader_config(f"{self._project_type.value}.json")
             for loader_config_path in project_loader_config:
                 if not loader_config_path.endswith(".json"):
                     continue
                 
-                self._process_loader(loader_config_path, aidb, output_db)
+                self._process_loader(loader_config_path, output_db)
                 
         for feature in self._features:
             feature.create(output_connection_string)
@@ -84,7 +81,7 @@ class Project:
     def add_feature(self, feature: Feature):
         self._features.append(feature)
 
-    def _process_loader(self, loader_config_path: [str, Path], aidb: Connection, output_db: Connection):
+    def _process_loader(self, loader_config_path: [str, Path], output_db: Connection):
         loader_config_path = Path(loader_config_path)
         loader_type, loader_config = next(iter(self._read_loader_config(loader_config_path).items()))
         loader_name = loader_config.get("name", loader_config_path.name)
@@ -103,13 +100,14 @@ class Project:
         elif loader_type == "SQLLoaderMapping":
             fetch_query, _ = self._parse_sql(loader_config["fetch_sql"])[0]
             load_query, load_params = self._parse_sql(loader_config["load_sql"])[0]
-            aidb_data = aidb.execute(fetch_query)
-            cols = aidb_data.keys()
-            for row in aidb_data:
-                row_data = dict(zip(cols, row))
-                output_db.execute(load_query.bindparams(**{
-                    k: v for k, v in row_data.items() if k in load_params
-                }))
+            with get_connection(str(self._aidb_path)) as aidb:
+                aidb_data = aidb.execute(fetch_query)
+                cols = aidb_data.keys()
+                for row in aidb_data:
+                    row_data = dict(zip(cols, row))
+                    output_db.execute(load_query.bindparams(**{
+                        k: v for k, v in row_data.items() if k in load_params
+                    }))
         elif loader_type == "StaticLoaderMapping":
             table_name = loader_config["table"]
             md = MetaData()
