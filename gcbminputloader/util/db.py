@@ -1,3 +1,4 @@
+from __future__ import annotations
 import urllib
 import psutil
 import warnings
@@ -10,7 +11,7 @@ from sqlalchemy.exc import SAWarning
 warnings.filterwarnings("ignore", category=SAWarning)
 
 @contextmanager
-def get_connection(connection_string, optimize=False):
+def get_connection(connection_string: str, optimize:bool = False) -> Connection:
     connection_string = str(connection_string)
     connection_url = "sqlite://"
     schema = None

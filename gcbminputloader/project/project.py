@@ -138,7 +138,7 @@ class Project:
         return queries
     
     def _get_resource_path(self, filename: [str, Path], dialect: str = None) -> Path:
-        resource_root = Path(gcbminputloader.__file__).parent.joinpath("resources", "loader")
+        resource_root = Path(gcbminputloader.__file__).parent.joinpath("resources", "Loader")
         resource_path = resource_root.joinpath(filename)
         if dialect:
             dialect_suffix = f"{resource_path.suffix}.{dialect}"
