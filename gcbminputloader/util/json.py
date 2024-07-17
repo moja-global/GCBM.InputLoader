@@ -21,9 +21,8 @@ class InputLoaderJson:
 
     def _load_borked(self):
         return json.loads(
-            open(self._path, "rb")
+            open(self._path, encoding="utf-8-sig")
                 .read()
-                .decode("utf8")[1:]
-                .replace("\r\n", "")
+                .replace("\n", "")
                 .replace("\t", " ")
         )
