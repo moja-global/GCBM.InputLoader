@@ -98,7 +98,7 @@ namespace Recliner2GCBM.ViewModel
                 var disturbanceTypes = new List<string>();
                 using (var command = aidb.CreateCommand())
                 {
-                    command.CommandText = "SELECT name FROM disturbance_type";
+                    command.CommandText = "SELECT name FROM disturbance_type_tr WHERE locale_id = 1";
                     var results = command.ExecuteReader();
                     while (results.Read())
                     {

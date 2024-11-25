@@ -282,6 +282,12 @@
     <Content Include="Resources\Loader\Common\drop_growth_curve_tables.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Loader\Common\soil_types.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Loader\Common\initial_soil_pool_values.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\Loader\DDL\cbmclassicaspatial.ddl.postgresql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

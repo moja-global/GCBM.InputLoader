@@ -1,0 +1,33 @@
+{
+    "project_type": "GcbmClassicSpatial",
+    "classifiers": [
+        "Classifier1",
+        "Classifier2"
+    ],
+    "aidb": "cbm_defaults_v1.2.8340.362.db",
+    "features": {
+        "growth_curves": {
+            "path": "yield.csv",
+            "interval": 10,
+            "aidb_species_col": 2,
+            "increment_start_col": 3,
+            "increment_end_col": 38,
+            "classifier_cols": {
+                "Classifier1": 0,
+                "Classifier2": 1
+            },
+            "worksheet": 0
+        },
+        "transition_rules": {
+            "path": "..\\layers\\tiled\\transition_rules.csv",
+            "id_col": 0,
+            "reset_age_col": 2,
+            "regen_delay_col": 1,
+            "classifier_transition_cols": {
+                "Classifier1": 3,
+                "Classifier2": 4
+            },
+            "worksheet": 0
+        }
+    }
+}
