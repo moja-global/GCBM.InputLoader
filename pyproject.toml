@@ -17,3 +17,4 @@ gcbminput = "gcbminputloader.scripts.inputloader:cli"
 
 [tool.hatch.build.targets.wheel.force-include]
 "ProjectLoader/Resources" = "gcbminputloader/resources"
+"Files/example_loader_config.json" = "gcbminputloader/examples/example_loader_config.json"
