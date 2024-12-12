@@ -8,7 +8,7 @@ CREATE TABLE classifier_value (
     UNIQUE (classifier_id, value));
 CREATE TABLE classifier (
   id    SERIAL NOT NULL, 
-  name text NOT NULL, 
+  name text NOT NULL UNIQUE, 
   PRIMARY KEY (id));
 CREATE TABLE spatial_unit (
   id                   SERIAL NOT NULL, 

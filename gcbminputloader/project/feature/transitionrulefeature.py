@@ -74,13 +74,17 @@ class TransitionRuleFeature(Feature):
 
     def _load_classifier_values(self, conn: Connection, transition_rule_data: DataFrame):
         logging.info("  classifier values")
-        unique_classifier_values = {
-            classifier_name: transition_rule_data[transition_rule_data.columns[classifier_col]].unique()
-            for classifier_name, classifier_col in chain(
-                self._transition_classifier_mapping.items(),
-                (self._match_classifier_mapping or {}).items()
-            ) if classifier_col is not None
-        }
+        unique_classifier_values = defaultdict(list)
+        for classifier_name, classifier_col in chain(
+            self._transition_classifier_mapping.items(),
+            (self._match_classifier_mapping or {}).items()
+        ):
+            if classifier_col is None:
+                continue
+
+            unique_classifier_values[classifier_name].extend(
+                transition_rule_data[transition_rule_data.columns[classifier_col]].unique()
+            )
         
         conn.execute(
             text("INSERT INTO classifier (name) VALUES (:name) ON CONFLICT DO NOTHING"),
@@ -173,7 +177,20 @@ class TransitionRuleFeature(Feature):
                 continue
             
             transition_id = transition_id_lookup[transition_data_row.iloc[self._id_col]]
-            disturbance_type_id = disturbance_type_lookup[disturbance_type.lower()]
+            disturbance_type_id = disturbance_type_lookup.get(disturbance_type.lower())
+            if disturbance_type_id is None:
+                logging.info(f"    warning: added new disturbance type '{disturbance_type}'")
+                conn.execute(text(
+                    """
+                    INSERT INTO disturbance_type (disturbance_category_id, name, code)
+                    SELECT 1, :name, MAX(code) + 1
+                    FROM disturbance_type
+                    LIMIT 1
+                    """
+                ), {"name": disturbance_type})
+
+                disturbance_type_id = conn.execute(text("SELECT last_insert_rowid()")).fetchone()[0]
+
             conn.execute(text(
                 """
                 INSERT INTO transition_rule (transition_id, disturbance_type_id)

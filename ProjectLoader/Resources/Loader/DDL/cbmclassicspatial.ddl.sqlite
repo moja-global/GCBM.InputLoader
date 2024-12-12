@@ -9,8 +9,10 @@ CREATE TABLE classifier_value (
   FOREIGN KEY(classifier_id) REFERENCES classifier(id));
 CREATE TABLE classifier (
   id    INTEGER NOT NULL, 
-  name clob NOT NULL, 
-  PRIMARY KEY (id));
+  name varchar(255) NOT NULL, 
+  PRIMARY KEY (id),
+  CONSTRAINT u_classifier_name
+    UNIQUE (name));
 CREATE TABLE spatial_unit (
   id                   INTEGER NOT NULL, 
   admin_boundary_id   integer(10) NOT NULL, 
