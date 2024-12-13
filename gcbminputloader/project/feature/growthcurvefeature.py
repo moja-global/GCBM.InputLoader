@@ -70,8 +70,11 @@ class GrowthCurveFeature(Feature):
     def _load_classifier_values(self, conn: Connection, gc_data: DataFrame):
         logging.info("  classifier values")
         unique_classifier_values = {
-            classifier_name: gc_data[gc_data.columns[classifier_col]].unique()
-            for classifier_name, classifier_col in self._classifier_mapping.items()
+            classifier_name: (
+                gc_data[gc_data.columns[classifier_col]].unique()
+                if classifier_col is not None
+                else ["?"]
+            ) for classifier_name, classifier_col in self._classifier_mapping.items()
         }
             
         conn.execute(
@@ -96,7 +99,10 @@ class GrowthCurveFeature(Feature):
         
     def _get_gc_name(self, gc_data_row: Series) -> str:
         classifier_values = [
-            gc_data_row.iloc[col] for col in self._classifier_mapping.values()
+            gc_data_row.iloc[col]
+            if col is not None
+            else "?"
+            for col in self._classifier_mapping.values()
         ]
         
         return ",".join((str(v) for v in classifier_values))
@@ -122,6 +128,8 @@ class GrowthCurveFeature(Feature):
         
             classifier_value_ids = [
                 classifier_value_lookup[classifier_name][str(gc_data_row.iloc[classifier_col])]
+                if classifier_col is not None
+                else classifier_value_lookup[classifier_name]["?"]
                 for classifier_name, classifier_col in self._classifier_mapping.items()
             ]
 

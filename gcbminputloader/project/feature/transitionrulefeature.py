@@ -86,10 +86,18 @@ class TransitionRuleFeature(Feature):
                 transition_rule_data[transition_rule_data.columns[classifier_col]].unique()
             )
         
-        conn.execute(
-            text("INSERT INTO classifier (name) VALUES (:name) ON CONFLICT DO NOTHING"),
-            [{"name": classifier} for classifier in unique_classifier_values.keys()]
-        )
+        new_classifiers = [
+            c for c in unique_classifier_values.keys()
+            if conn.execute(text(
+                "SELECT EXISTS(SELECT * FROM classifier WHERE name = :classifier)"
+            ), {"classifier": c}).fetchone()[0] == 0
+        ]
+
+        if new_classifiers:
+            conn.execute(
+                text("INSERT INTO classifier (name) VALUES (:name) ON CONFLICT DO NOTHING"),
+                [{"name": classifier} for classifier in new_classifiers]
+            )
             
         classifier_ids = {
             row.name: row.id
@@ -108,6 +116,17 @@ class TransitionRuleFeature(Feature):
                 for value in chain(classifier_values, ["?"])
                 if not (isinstance(value, Number) and np.isnan(value))
             ])
+
+        for new_classifier in new_classifiers:
+            conn.execute(text(
+                """
+                INSERT INTO growth_curve_classifier_value (growth_curve_id, classifier_value_id)
+                SELECT gc.id, cv.id
+                FROM growth_curve gc, classifier_value cv
+                WHERE cv.classifier_id = :classifier_id
+                    AND cv.value = '?'
+                """
+            ), {"classifier_id": classifier_ids[new_classifier]})
         
     def _load_transitions(self, conn: Connection, transition_rule_data: DataFrame) -> dict[str, int]:
         logging.info("  base transitions")
