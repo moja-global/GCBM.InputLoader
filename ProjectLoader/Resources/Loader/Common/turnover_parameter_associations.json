@@ -24,7 +24,15 @@
             ), (
                 SELECT
                     CASE WHEN f_tr.name LIKE 'Mixedwood' THEN 'Hardwood' ELSE f_tr.name END AS ForestTypeName,
-                    g_tr.name AS GenusName
+                    CASE
+                        WHEN g_tr.name IN ('Missing Value', 'Not applicable')
+                            THEN CASE
+                                WHEN f_tr.name IN ('Mixedwood', 'Hardwood')
+                                    THEN 'Unspecified broad-leaved species'
+                                ELSE 'Unspecified conifirs'
+                            END
+                        ELSE g_tr.name
+                    END AS GenusName
                 FROM genus g
                 INNER JOIN genus_tr g_tr
                     ON g.id = g_tr.genus_id
@@ -35,7 +43,6 @@
                 INNER JOIN forest_type_tr f_tr
                     ON f.id = f_tr.forest_type_id
                 WHERE f_tr.name IN ('Hardwood', 'Mixedwood')
-                    AND LOWER(g_tr.name) NOT LIKE '%missing value%'
                     AND g_tr.locale_id = 1
                     AND f_tr.locale_id = 1
             ) AS hw_genus
@@ -63,7 +70,15 @@
             ), (
                 SELECT
                     f_tr.name AS ForestTypeName,
-                    g_tr.name AS GenusName
+                    CASE
+                        WHEN g_tr.name IN ('Missing Value', 'Not applicable')
+                            THEN CASE
+                                WHEN f_tr.name IN ('Mixedwood', 'Hardwood')
+                                    THEN 'Unspecified broad-leaved species'
+                                ELSE 'Unspecified conifirs'
+                            END
+                        ELSE g_tr.name
+                    END AS GenusName
                 FROM genus g
                 INNER JOIN genus_tr g_tr
                     ON g.id = g_tr.genus_id
@@ -74,7 +89,6 @@
                 INNER JOIN forest_type_tr f_tr
                     ON f.id = f_tr.forest_type_id
                 WHERE f_tr.name = 'Softwood'
-                    AND LOWER(g_tr.name) NOT LIKE '%missing value%'
                     AND g_tr.locale_id = 1
                     AND f_tr.locale_id = 1
             ) AS sw_genus

@@ -5,7 +5,15 @@
             SELECT
                 s_tr.name AS SpeciesTypeName,
                 f_tr.name AS ForestTypeName,
-                g_tr.name AS GenusName
+                CASE
+                    WHEN g_tr.name IN ('Missing Value', 'Not applicable')
+                        THEN CASE
+                            WHEN f_tr.name IN ('Mixedwood', 'Hardwood')
+                                THEN 'Unspecified broad-leaved species'
+                            ELSE 'Unspecified conifirs'
+                        END
+                    ELSE g_tr.name
+                END AS GenusName
             FROM species s
             INNER JOIN species_tr s_tr
                 ON s.id = s_tr.species_id

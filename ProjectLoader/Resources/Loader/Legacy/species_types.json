@@ -5,7 +5,11 @@
             SELECT
                 s.SpeciesTypeName,
                 IIF(f.ForestTypeName LIKE 'Mixedwood', 'Hardwood', f.ForestTypeName) AS ForestTypeName,
-                g.GenusName
+                IIF(g.canfi_code < 0,
+                    IIF(f.ForestTypeName IN ('Mixedwood', 'Hardwood'),
+                        'Unspecified broad-leaved species',
+                        'Unspecified conifirs'),
+                    g.GenusName) AS GenusName
             FROM tblForestTypeDefault f
             INNER JOIN (
                 tblGenusTypeDefault g
