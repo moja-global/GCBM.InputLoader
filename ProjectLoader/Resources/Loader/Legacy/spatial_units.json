@@ -16,7 +16,7 @@
                         ON c.DefaultSPUID = s.SPUID
                 ) ON a.AdminBoundaryID = s.AdminBoundaryID
             ) ON e.EcoBoundaryID = s.EcoBoundaryID
-            WHERE c.Year = 1980",
+            WHERE c.Year = (SELECT MIN(year) FROM tblClimateDefault)",
         "load_sql": "
             INSERT INTO spatial_unit (
                 admin_boundary_id,

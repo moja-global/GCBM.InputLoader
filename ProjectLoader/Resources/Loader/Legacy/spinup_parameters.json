@@ -11,7 +11,7 @@
                 INNER JOIN tblSPUDefault s
                     ON e.EcoBoundaryID = s.EcoBoundaryID
             ) ON c.DefaultSPUID = s.SPUID
-            WHERE Year = 1980
+            WHERE Year = (SELECT min(Year) FROM tblClimateDefault)
             GROUP BY
                 MeanAnnualTemp,
                 AverageAge",

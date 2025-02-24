@@ -173,7 +173,7 @@ class TransitionRuleFeature(Feature):
             ), [{
                 "transition_id": transition_id,
                 "classifier_value_id":
-                    classifier_value_lookup[classifier][transition_data_row.iloc[classifier_col]]
+                    classifier_value_lookup[classifier][str(transition_data_row.iloc[classifier_col])]
             } for classifier, classifier_col in self._transition_classifier_mapping.items()])
 
     def _load_soft_transitions(
