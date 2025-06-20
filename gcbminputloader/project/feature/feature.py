@@ -8,7 +8,7 @@ class Feature:
         raise NotImplementedError()
 
     def save(self, config: Configuration):
-        raise NotImplementedError()
+        pass
 
     def _load_data(
         self, path: [str, Path], header:bool = True, allow_nulls=True,

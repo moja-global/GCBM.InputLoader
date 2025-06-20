@@ -10,6 +10,7 @@ from sqlalchemy import insert
 from gcbminputloader.util.json import InputLoaderJson
 from gcbminputloader.util.db import get_connection
 from gcbminputloader.util.configuration import Configuration
+from gcbminputloader.project.feature.dmassociationsfeature import DMAssociationsFeature
 
 class ProjectType(Enum):
 
@@ -35,6 +36,13 @@ class Project:
         self._aidb_path = aidb_path
         self._classifiers = classifiers
         self._features = []
+        self._override_features = {
+            "Disturbance matrix associations": DMAssociationsFeature(aidb_path)
+        }
+
+    @property
+    def aidb_path(self):
+        return self._aidb_path
 
     def create(self, output_connection_string: str):
         logging.debug(f"Loading {output_connection_string} using {self._aidb_path}")
@@ -49,6 +57,9 @@ class Project:
                 
                 self._process_loader(loader_config_path, output_db)
                 
+        for feature in self._override_features.values():
+            feature.create(output_connection_string)
+
         for feature in self._features:
             feature.create(output_connection_string)
     
@@ -85,6 +96,9 @@ class Project:
         loader_config_path = Path(loader_config_path)
         loader_type, loader_config = next(iter(self._read_loader_config(loader_config_path).items()))
         loader_name = loader_config.get("name", loader_config_path.name)
+        if loader_name in self._override_features:
+            return
+
         logging.info(f"  {loader_name}")
         if loader_type == "InternalLoaderMapping":
             queries = self._parse_sql(

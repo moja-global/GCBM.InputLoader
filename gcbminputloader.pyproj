@@ -5,14 +5,16 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{d8ea3bc2-61a9-43c4-b2cf-e36bce05b524}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>gcbminputloader\__main__.py</StartupFile>
     <SearchPath />
-    <WorkingDirectory>.</WorkingDirectory>
+    <WorkingDirectory>C:\Projects\CanFIRE\3a_Standalone_Template_JSON_Workflow\input_database</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <CommandLineArguments>gcbm_input.json gcbm_input.db</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -21,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="gcbminputloader\project\feature\disturbancecategoryfeature.py" />
+    <Compile Include="gcbminputloader\project\feature\dmassociationsfeature.py" />
     <Compile Include="gcbminputloader\project\feature\transitionrulefeature.py" />
     <Compile Include="gcbminputloader\project\feature\growthcurvefeature.py" />
     <Compile Include="gcbminputloader\project\feature\feature.py" />

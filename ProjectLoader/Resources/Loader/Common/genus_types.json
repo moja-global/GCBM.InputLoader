@@ -2,7 +2,7 @@
     "SQLLoaderMapping": {
         "name": "Genus types",
         "fetch_sql": "
-            SELECT name AS GenusName
+            SELECT DISTINCT name AS GenusName
             FROM genus g
             INNER JOIN genus_tr g_tr
                 ON g.id = g_tr.genus_id

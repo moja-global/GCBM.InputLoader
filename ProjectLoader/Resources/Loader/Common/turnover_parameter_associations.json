@@ -111,6 +111,7 @@
                 AND p.fine_root = @fine_root
                 AND p.branch_snag_split = @branch_snag_split
                 AND p.coarse_ag_split = @coarse_ag_split
-                AND p.fine_ag_split = @fine_ag_split"
+                AND p.fine_ag_split = @fine_ag_split
+            ON CONFLICT DO NOTHING"
     }
 }
