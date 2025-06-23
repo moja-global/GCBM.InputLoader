@@ -2,7 +2,7 @@
     "SQLLoaderMapping": {
         "name": "Spinup parameters",
         "fetch_sql": "
-            SELECT
+            SELECT DISTINCT
                 historic_mean_temperature AS MeanAnnualTemp,
                 return_interval AS ReturnInterval,
                 max_rotations AS MaxRotations
