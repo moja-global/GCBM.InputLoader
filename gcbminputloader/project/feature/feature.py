@@ -11,7 +11,7 @@ class Feature:
         pass
 
     def _load_data(
-        self, path: [str, Path], header:bool = True, allow_nulls=True,
+        self, path: [str, Path], header:bool = True, allow_nulls:bool = True,
         **kwargs: Any
     ) -> DataFrame:
         path = Path(path)
@@ -22,7 +22,7 @@ class Feature:
                 sheet_name=kwargs.get("sheet_name")
             )
         
-        data = pd.read_csv(path, header=0 if header else None)
+        data = pd.read_csv(path, header=0 if header else None, low_memory=False)
         if not allow_nulls and pd.isna(data).any().agg("max"):
             raise RuntimeError(f"Error: found null values in {path}")
 
