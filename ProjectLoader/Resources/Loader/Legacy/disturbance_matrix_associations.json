@@ -3,10 +3,10 @@
         "name": "Disturbance matrix associations",
         "fetch_sql": "
             SELECT
-                TRIM(a.adminboundaryname) AS adminboundaryname,
-                TRIM(e.ecoboundaryname) AS ecoboundaryname,
-                dtd.disttypename, 
-                dm.dmid & '_' & dm.name AS dmname
+                TRIM(a.adminboundaryname) AS admin,
+                TRIM(e.ecoboundaryname) AS eco,
+                dtd.disttypename AS dist_type, 
+                dm.dmid & '_' & dm.name AS dm
             FROM tbladminboundarydefault a
             INNER JOIN (
                 tblecoboundarydefault e
@@ -43,10 +43,10 @@
                     WHERE dma.annualorder = 1)
             UNION
             SELECT
-                TRIM(a.adminboundaryname) AS adminboundaryname,
-                TRIM(e.ecoboundaryname) AS ecoboundaryname,
-                dtd.disttypename,
-                dm.dmid & '_' & dm.name AS dmname
+                TRIM(a.adminboundaryname) AS admin,
+                TRIM(e.ecoboundaryname) AS eco,
+                dtd.disttypename AS dist_type,
+                dm.dmid & '_' & dm.name AS dm
             FROM tbladminboundarydefault a
             INNER JOIN (
                 tblecoboundarydefault e
@@ -79,9 +79,9 @@
                 ON spu.admin_boundary_id = a.id
             INNER JOIN eco_boundary e
                 ON spu.eco_boundary_id = e.id
-            WHERE a.name = @adminboundaryname
-                AND e.name = @ecoboundaryname
-                AND dt.name = @disttypename
-                AND dm.name = @dmname"
+            WHERE a.name = @admin
+                AND e.name = @eco
+                AND dt.name = @dist_type
+                AND dm.name = @dm"
     }
 }
