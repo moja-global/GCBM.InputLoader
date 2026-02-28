@@ -238,7 +238,7 @@ class TransitionRuleFeature(Feature):
                     """
                 ), {
                     "transition_rule_id": transition_rule_id,
-                    "classifier_value_id": classifier_value_lookup[classifier_name][classifier_value]
+                    "classifier_value_id": classifier_value_lookup[classifier_name][str(classifier_value)]
                 })
 
     def _get_transition_type_lookup(self, conn: Connection) -> dict[str, int]:
@@ -257,7 +257,7 @@ class TransitionRuleFeature(Feature):
                 ON cv.classifier_id = c.id
             """
         )):
-            classifier_value_lookup[row.classifier][row.classifier_value] = row.id
+            classifier_value_lookup[row.classifier][str(row.classifier_value)] = row.id
 
         return classifier_value_lookup
 
