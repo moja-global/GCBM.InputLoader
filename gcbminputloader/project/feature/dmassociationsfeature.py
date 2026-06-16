@@ -10,8 +10,9 @@ from gcbminputloader.util.json import InputLoaderJson
 
 class DMAssociationsFeature(Feature):
     
-    def __init__(self, aidb_path: [str, Path]):
+    def __init__(self, aidb_path: [str, Path], locale: str = "en-CA"):
         self._aidb_path = aidb_path
+        self._locale = locale
 
     def create(self, output_connection_string: str):
         logging.info("Loading disturbance matrix associations...")
@@ -71,12 +72,14 @@ class DMAssociationsFeature(Feature):
                 ON dma.disturbance_matrix_id = dm.id
             INNER JOIN disturbance_matrix_tr dm_tr
                 ON dm.id = dm_tr.disturbance_matrix_id
-            WHERE e_tr.locale_id = 1
-                AND a_tr.locale_id = 1
-                AND dt_tr.locale_id = 1
-                AND dm_tr.locale_id = 1
+            INNER JOIN locale
+                ON e_tr.locale_id = locale.id
+                AND a_tr.locale_id = locale.id
+                AND dt_tr.locale_id = locale.id
+                AND dm_tr.locale_id = locale.id
+            WHERE locale.code = :locale
             """
-        ))
+        ), {"locale": self._locale})
 
     def _get_aidb_dm_associations(self, conn: Connection) -> CursorResult:
         resource_root = Path(gcbminputloader.__file__).parent.joinpath("resources", "Loader")

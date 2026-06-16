@@ -19,7 +19,6 @@
                 @MaxRotations AS max_rotations,
                 @MeanAnnualTemp AS mean_annual_temperature
             FROM disturbance_type dt
-            WHERE dt.name = 'Wild Fire'
-                OR dt.name = 'Wildfire'"
+            WHERE dt.code = 1"
     }
 }

@@ -18,9 +18,11 @@
                 ON gmv.forest_type_id = ft.id
             INNER JOIN forest_type_tr ft_tr
                 ON ft.id = ft_tr.forest_type_id
+            INNER JOIN locale
+                ON dt_tr.locale_id = locale.id
+                AND ft_tr.locale_id = locale.id
             WHERE gmv.value <> 1
-                AND dt_tr.locale_id = 1
-                AND ft_tr.locale_id = 1
+                AND locale.code = 'en-CA'
             GROUP BY
                 dt_tr.name,
                 gmv.time_step,

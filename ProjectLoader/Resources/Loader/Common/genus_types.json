@@ -6,7 +6,9 @@
             FROM genus g
             INNER JOIN genus_tr g_tr
                 ON g.id = g_tr.genus_id
-            WHERE g_tr.locale_id = 1",
+            INNER JOIN locale
+                ON g_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "INSERT INTO genus (name) VALUES (@GenusName)"
     }
 }

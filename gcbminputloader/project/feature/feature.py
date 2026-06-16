@@ -1,6 +1,7 @@
 from __future__ import annotations
 import pandas as pd
 from pathlib import Path
+from gcbminputloader.util.encoding import load_csv
 
 class Feature:
 
@@ -21,8 +22,9 @@ class Feature:
                 header=0 if self._header else None,
                 sheet_name=kwargs.get("sheet_name")
             )
-        
-        data = pd.read_csv(path, header=0 if header else None, low_memory=False)
+        else:
+            data = load_csv(path, header=0 if header else None, low_memory=False)
+
         if not allow_nulls and pd.isna(data).any().agg("max"):
             raise RuntimeError(f"Error: found null values in {path}")
 

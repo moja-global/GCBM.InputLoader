@@ -6,7 +6,9 @@
             FROM admin_boundary a
             INNER JOIN admin_boundary_tr a_tr
                 ON a.id = a_tr.admin_boundary_id
-            WHERE locale_id = 1",
+            INNER JOIN locale
+                ON a_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "INSERT INTO admin_region (name) VALUES (@AdminBoundaryName)"
     }
 }

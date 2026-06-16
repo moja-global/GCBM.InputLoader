@@ -6,7 +6,9 @@
             FROM eco_boundary e
             INNER JOIN eco_boundary_tr e_tr
                 ON e.id = e_tr.eco_boundary_id
-            WHERE locale_id = 1",
+            INNER JOIN locale
+                ON e_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO eco_boundary (
                 eco_region_id,

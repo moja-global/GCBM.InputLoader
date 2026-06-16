@@ -1,38 +1,50 @@
 ﻿{
-    "StaticLoaderMapping": {
-        "name": "Static pool data",
-        "table": "pool",
-        "fields": [ "name" ],
-        "data": [
-            [ "SoftwoodMerch" ],
-            [ "SoftwoodFoliage" ],
-            [ "SoftwoodOther" ],
-            [ "SoftwoodCoarseRoots" ],
-            [ "SoftwoodFineRoots" ],
-            [ "HardwoodMerch" ],
-            [ "HardwoodFoliage" ],
-            [ "HardwoodOther" ],
-            [ "HardwoodCoarseRoots" ],
-            [ "HardwoodFineRoots" ],
-            [ "AboveGroundVeryFastSoil" ],
-            [ "BelowGroundVeryFastSoil" ],
-            [ "AboveGroundFastSoil" ],
-            [ "BelowGroundFastSoil" ],
-            [ "MediumSoil" ],
-            [ "AboveGroundSlowSoil" ],
-            [ "BelowGroundSlowSoil" ],
-            [ "SoftwoodStemSnag" ],
-            [ "SoftwoodBranchSnag" ],
-            [ "HardwoodStemSnag" ],
-            [ "HardwoodBranchSnag" ],
-            [ "CO2" ],
-            [ "CH4" ],
-            [ "CO" ],
-            [ "NO2" ],
-            [ "Products" ],
-            [ "Atmosphere" ],
-            [ "BlackCarbon" ],
-            [ "Peat" ]
-        ]
+    "SQLLoaderMapping": {
+        "name": "Pool data",
+        "fetch_sql": "
+            SELECT p.id, p_tr.gcbm_pool_name AS PoolName
+            FROM pool p
+            INNER JOIN (
+                SELECT
+                    p.id AS pool_id,
+                    p_tr.name AS cbm_defaults_pool_name,
+                    CASE
+                        WHEN p_tr.name = 'Softwood Merchantable' THEN 'SoftwoodMerch'
+                        WHEN p_tr.name = 'Softwood Foliage' THEN 'SoftwoodFoliage'
+                        WHEN p_tr.name = 'Softwood Other' THEN 'SoftwoodOther'
+                        WHEN p_tr.name = 'Softwood Coarse Roots' THEN 'SoftwoodCoarseRoots'
+                        WHEN p_tr.name = 'Softwood Fine Roots' THEN 'SoftwoodFineRoots'
+                        WHEN p_tr.name = 'Hardwood Merchantable' THEN 'HardwoodMerch'
+                        WHEN p_tr.name = 'Hardwood Foliage' THEN 'HardwoodFoliage'
+                        WHEN p_tr.name = 'Hardwood Other' THEN 'HardwoodOther'
+                        WHEN p_tr.name = 'Hardwood Coarse roots' THEN 'HardwoodCoarseRoots'
+                        WHEN p_tr.name = 'Hardwood Fine Roots' THEN 'HardwoodFineRoots'
+                        WHEN p_tr.name = 'Aboveground Very Fast DOM' THEN 'AboveGroundVeryFastSoil'
+                        WHEN p_tr.name = 'Belowground Very Fast DOM' THEN 'BelowGroundVeryFastSoil'
+                        WHEN p_tr.name = 'Aboveground Fast DOM' THEN 'AboveGroundFastSoil'
+                        WHEN p_tr.name = 'Belowground Fast DOM' THEN 'BelowGroundFastSoil'
+                        WHEN p_tr.name = 'Medium DOM' THEN 'MediumSoil'
+                        WHEN p_tr.name = 'Aboveground Slow DOM' THEN 'AboveGroundSlowSoil'
+                        WHEN p_tr.name = 'Belowground Slow DOM' THEN 'BelowGroundSlowSoil'
+                        WHEN p_tr.name = 'Softwood Stem Snag' THEN 'SoftwoodStemSnag'
+                        WHEN p_tr.name = 'Softwood Branch Snag' THEN 'SoftwoodBranchSnag'
+                        WHEN p_tr.name = 'Hardwood Stem Snag' THEN 'HardwoodStemSnag'
+                        WHEN p_tr.name = 'Hardwood Branch Snag' THEN 'HardwoodBranchSnag'
+                        ELSE p_tr.name
+                    END AS gcbm_pool_name
+                FROM pool p
+                INNER JOIN pool_tr p_tr
+                    ON p.id = p_tr.pool_id
+                INNER JOIN locale
+                    ON p_tr.locale_id = locale.id
+                WHERE locale.code = 'en-CA'
+            ) AS p_tr
+                ON p.id = p_tr.pool_id
+            WHERE p.id > 0
+            UNION SELECT 27 AS id, 'Atmosphere' AS PoolName
+            UNION SELECT 28 AS id, 'BlackCarbon' AS PoolName
+            UNION SELECT 29 AS id, 'Peat' AS PoolName
+            ORDER BY id",
+        "load_sql": "INSERT INTO pool (name) VALUES (@PoolName)"
     }
 }
