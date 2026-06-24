@@ -31,7 +31,7 @@ class ProjectFactory:
         
     def from_config(self, project_type: ProjectType, config: Configuration) -> Project:
         aidb_path = config.resolve(config["aidb"])
-        project = Project(project_type, aidb_path, config["classifiers"])
+        project = Project(project_type, aidb_path, config["classifiers"], config.get("locale", "en-CA"))
         for feature_name, feature_config in config.get("features", {}).items():
             project.add_feature(self._build_feature(project, feature_name, feature_config))
 

@@ -11,9 +11,11 @@
             FROM admin_boundary a
             INNER JOIN admin_boundary_tr a_tr
                 ON a.id = a_tr.admin_boundary_id
+            INNER JOIN locale
+                ON a_tr.locale_id = locale.id
             INNER JOIN stump_parameter sp
                 ON a.stump_parameter_id = sp.id
-            WHERE locale_id = 1",
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO admin_boundary (admin_region_id, stump_parameter_id, name)
             SELECT ar.id, sp.id, @AdminBoundaryName AS name

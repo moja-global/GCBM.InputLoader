@@ -6,7 +6,9 @@
             FROM disturbance_matrix dm
             INNER JOIN disturbance_matrix_tr dm_tr
                 ON dm.id = dm_tr.disturbance_matrix_id
-            WHERE dm_tr.locale_id = 1",
+            INNER JOIN locale
+                ON dm_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "INSERT INTO disturbance_matrix (name) VALUES (@DMName)"
     }
 }

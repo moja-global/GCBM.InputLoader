@@ -10,6 +10,8 @@
             FROM disturbance_matrix dm
             INNER JOIN disturbance_matrix_tr dm_tr
                 ON dm.id = dm_tr.disturbance_matrix_id
+            INNER JOIN locale
+                ON dm_tr.locale_id = locale.id
             INNER JOIN disturbance_matrix_value dmv
                 ON dmv.disturbance_matrix_id = dm.id
             INNER JOIN pool src
@@ -45,7 +47,9 @@
                 FROM pool p
                 INNER JOIN pool_tr p_tr
                     ON p.id = p_tr.pool_id
-                WHERE p_tr.locale_id = 1
+                INNER JOIN locale
+                    ON p_tr.locale_id = locale.id
+                WHERE locale.code = 'en-CA'
             ) AS src_tr
                 ON src.id = src_tr.pool_id
             INNER JOIN pool snk
@@ -81,10 +85,12 @@
                 FROM pool p
                 INNER JOIN pool_tr p_tr
                     ON p.id = p_tr.pool_id
-                WHERE p_tr.locale_id = 1
+                INNER JOIN locale
+                    ON p_tr.locale_id = locale.id
+                WHERE locale.code = 'en-CA'
             ) AS snk_tr
                 ON snk.id = snk_tr.pool_id
-            WHERE dm_tr.locale_id = 1",
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO disturbance_matrix_value (
                 disturbance_matrix_id,

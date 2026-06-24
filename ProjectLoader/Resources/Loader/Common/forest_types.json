@@ -6,7 +6,9 @@
             FROM forest_type ft
             INNER JOIN forest_type_tr ft_tr
                 ON ft.id = ft_tr.forest_type_id
-            WHERE ft_tr.locale_id = 1",
+            INNER JOIN locale
+                ON ft_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "INSERT INTO forest_type (name) VALUES (@ForestTypeName)"
     }
 }

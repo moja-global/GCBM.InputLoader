@@ -26,10 +26,12 @@
                 ON dma.disturbance_matrix_id = dm.id
             INNER JOIN disturbance_matrix_tr dm_tr
                 ON dm.id = dm_tr.disturbance_matrix_id
-            WHERE e_tr.locale_id = 1
-                AND a_tr.locale_id = 1
-                AND dt_tr.locale_id = 1
-                AND dm_tr.locale_id = 1",
+            INNER JOIN locale
+                ON e_tr.locale_id = locale.id
+                AND a_tr.locale_id = locale.id
+                AND dt_tr.locale_id = locale.id
+                AND dm_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO disturbance_matrix_association (
                 spatial_unit_id,

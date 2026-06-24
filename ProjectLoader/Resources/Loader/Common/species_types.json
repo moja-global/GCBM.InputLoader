@@ -6,11 +6,49 @@
                 s_tr.name AS SpeciesTypeName,
                 f_tr.name AS ForestTypeName,
                 CASE
-                    WHEN g_tr.name IN ('Missing Value', 'Not applicable')
+                    WHEN g.id IN (
+                        SELECT g.id
+                        FROM genus g
+                        INNER JOIN genus_tr g_tr_en
+                            ON g.id = g_tr_en.genus_id
+                        WHERE g_tr_en.locale_id = 1
+                            AND g_tr_en.name IN ('Missing Value', 'Not applicable')
+                    )
                         THEN CASE
-                            WHEN f_tr.name IN ('Mixedwood', 'Hardwood')
-                                THEN 'Unspecified broad-leaved species'
-                            ELSE 'Unspecified conifirs'
+                            WHEN f.id IN (
+                                SELECT f.id
+                                FROM forest_type f
+                                INNER JOIN forest_type_tr f_tr_en
+                                    ON f.id = f_tr_en.forest_type_id
+                                WHERE f_tr_en.locale_id = 1
+                                    AND f_tr_en.name IN ('Mixedwood', 'Hardwood')
+                            )
+                                THEN (
+                                    SELECT g_tr_localized.name
+                                    FROM genus g
+                                    INNER JOIN genus_tr g_tr_en
+                                        ON g_tr_en.locale_id = 1
+                                        AND g.id = g_tr.genus_id
+                                    INNER JOIN genus_tr g_tr_localized
+                                        ON g.id = g_tr_localized.genus_id
+                                    INNER JOIN locale
+                                        ON g_tr_localized.locale_id = locale.id
+                                    WHERE locale.code = 'en-CA'
+                                        AND g_tr_en.name = 'Unspecified broad-leaved species'
+                                )
+                            ELSE (
+                                SELECT g_tr_localized.name
+                                FROM genus g
+                                INNER JOIN genus_tr g_tr_en
+                                    ON g_tr_en.locale_id = 1
+                                    AND g.id = g_tr.genus_id
+                                INNER JOIN genus_tr g_tr_localized
+                                    ON g.id = g_tr_localized.genus_id
+                                INNER JOIN locale
+                                    ON g_tr_localized.locale_id = locale.id
+                                WHERE locale.code = 'en-CA'
+                                    AND g_tr_en.name = 'Unspecified conifirs'
+                            )
                         END
                     ELSE g_tr.name
                 END AS GenusName
@@ -25,9 +63,11 @@
                 ON s.genus_id = g.id
             INNER JOIN genus_tr g_tr
                 ON g.id = g_tr.genus_id
-            WHERE s_tr.locale_id = 1
-                AND f_tr.locale_id = 1
-                AND g_tr.locale_id = 1",
+            INNER JOIN locale
+                ON s_tr.locale_id = locale.id
+                AND f_tr.locale_id = locale.id
+                AND g_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO species (
                 forest_type_id,

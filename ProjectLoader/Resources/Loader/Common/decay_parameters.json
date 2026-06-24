@@ -45,7 +45,9 @@
                 FROM pool p
                 INNER JOIN pool_tr p_tr
                     ON p.id = p_tr.pool_id
-                WHERE p_tr.locale_id = 1
+                INNER JOIN locale
+                    ON p_tr.locale_id = locale.id
+                WHERE locale.code = 'en-CA'
             ) AS p_tr
                 ON p.id = p_tr.pool_id",
         "load_sql": "

@@ -31,18 +31,29 @@ class ClassifierMapping(dict):
 
 class Project:
     
-    def __init__(self, project_type: ProjectType, aidb_path: [str, Path], classifiers: list[str]):
+    def __init__(
+        self,
+        project_type: ProjectType,
+        aidb_path: [str, Path],
+        classifiers: list[str],
+        locale: str = "en-CA",
+    ):
         self._project_type = project_type
         self._aidb_path = aidb_path
         self._classifiers = classifiers
+        self._locale = locale
         self._features = []
         self._override_features = {
-            "Disturbance matrix associations": DMAssociationsFeature(aidb_path)
+            "Disturbance matrix associations": DMAssociationsFeature(aidb_path, locale)
         }
 
     @property
     def aidb_path(self):
         return self._aidb_path
+    
+    @property
+    def locale(self):
+        return self._locale
 
     def create(self, output_connection_string: str):
         logging.debug(f"Loading {output_connection_string} using {self._aidb_path}")
@@ -145,6 +156,7 @@ class Project:
             if not sql or sql.isspace():
                 continue
             
+            sql = sql.replace("en-CA", self._locale)
             query = text(sql)
             query_params = set(query.compile().bind_names.values())
             queries.append((query, query_params))

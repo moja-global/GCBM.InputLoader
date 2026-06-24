@@ -87,9 +87,11 @@
                 ON all_v2b_params.species_id = sp.id
             INNER JOIN species_tr sp_tr
                 ON sp.id = sp_tr.species_id
-            WHERE a_tr.locale_id = 1
-                AND e_tr.locale_id = 1
-                AND sp_tr.locale_id = 1",
+            INNER JOIN locale
+                ON a_tr.locale_id = locale.id
+                AND e_tr.locale_id = locale.id
+                AND sp_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO vol_to_bio_factor_association (
                 spatial_unit_id,

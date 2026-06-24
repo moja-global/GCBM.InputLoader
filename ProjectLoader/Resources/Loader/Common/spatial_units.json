@@ -18,8 +18,10 @@
                 ON e.id = e_tr.eco_boundary_id
             INNER JOIN spinup_parameter sp
                 ON spu.spinup_parameter_id = sp.id
-            WHERE a_tr.locale_id = 1
-                AND e_tr.locale_id = 1",
+            INNER JOIN locale
+                ON a_tr.locale_id = locale.id
+                AND e_tr.locale_id = locale.id
+            WHERE locale.code = 'en-CA'",
         "load_sql": "
             INSERT INTO spatial_unit (
                 admin_boundary_id,
