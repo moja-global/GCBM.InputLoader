@@ -4,7 +4,7 @@
     "Common/disturbance_categories.json",
     "Common/land_class_data.json",
     "Legacy/pool_data.json",
-    "Common/root_parameters.json",
+    "Legacy/root_parameters.json",
     "Legacy/dom_pools.json",
     "Common/transition_types.json",
     "Legacy/admin_regions.json",
